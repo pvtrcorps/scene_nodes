@@ -31,7 +31,7 @@ from .nodes.global_options import GlobalOptionsNode
 from .nodes.outputs_stub import OutputsStubNode
 from .nodes.scene_output import SceneOutputNode
 from .nodes.input import InputNode
-from .nodes.render_properties import RenderCyclesNode, RenderEeveeNode
+from .nodes.render_properties import RenderSettingsNode
 from .nodes.output_properties import OutputPropertiesNode
 from .nodes.scene_properties import ScenePropertiesNode
 
@@ -55,7 +55,7 @@ classes = [
     StringSocket,
     SceneInstanceNode, TransformNode, GroupNode,
     LightNode, GlobalOptionsNode, OutputsStubNode, SceneOutputNode, InputNode,
-    RenderCyclesNode, RenderEeveeNode, OutputPropertiesNode, ScenePropertiesNode,
+    RenderSettingsNode, OutputPropertiesNode, ScenePropertiesNode,
     NODE_OT_sync_to_scene,
     SCENE_GRAPH_MT_add,
 ]
