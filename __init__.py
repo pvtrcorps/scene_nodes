@@ -59,7 +59,6 @@ NODETREE_CATEGORY = 'SCENE_NODES'
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
-    bpy.types.Scene.scene_node_tree = bpy.props.PointerProperty(type=SceneNodeTree)
     register_node_categories(NODETREE_CATEGORY, node_categories)
     ui.register()
 
@@ -67,6 +66,5 @@ def register():
 def unregister():
     ui.unregister()
     unregister_node_categories(NODETREE_CATEGORY)
-    del bpy.types.Scene.scene_node_tree
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
