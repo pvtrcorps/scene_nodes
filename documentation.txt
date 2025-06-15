@@ -101,4 +101,14 @@ evaluación del árbol aplica los cambios directamente en la escena de Blender e
 lugar de limitarse a imprimir información en la consola. Sirve como base para
 futuros flujos de trabajo nodales de ensamblaje de escenas.
 
+Notas sobre la evaluación
+-------------------------
+- **Group** solo fusiona los objetos de las escenas conectadas. Otros datos,
+  como las opciones de render, no se combinan automáticamente.
+- Las opciones de render o salida establecidas en nodos como **Global
+  Options** o **Render Outputs** se aplican siguiendo el orden de evaluación.
+  Si varios nodos modifican el mismo valor, prevalece el que esté más cerca de
+  **Scene Output**, del mismo modo que hacen herramientas como *Gaffer*, donde
+  el nodo final de la cadena es el que manda.
+
 ---

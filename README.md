@@ -41,3 +41,11 @@ tree.links.new(inst.outputs[0], out.inputs[0])
 # Evaluate the tree (applies changes to the scene)
 evaluate_scene_tree(tree)
 ```
+
+## Evaluation Order
+
+`Group` nodes merge only the objects from their connected scenes. Render and
+output options defined in upstream nodes are applied sequentially so nodes
+closer to **Scene Output** override earlier values. This mirrors how tools such
+as [Gaffer](https://gafferhq.org/) resolve conflicts: the last node in the
+chain wins.
