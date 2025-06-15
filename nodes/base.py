@@ -112,6 +112,8 @@ def build_props_and_sockets(cls, descriptors):
         attr, typ, kwargs = desc[:3]
 
         prop_fn, socket_id = PROPERTY_SOCKET_MAP[typ]
+        kwargs = dict(kwargs)
+        kwargs['update'] = BaseNode.update_socket_values
         setattr(cls, attr, prop_fn(**kwargs))
         label = kwargs.get('name', attr)
         expose_prop = f"expose_{_sanitize(attr)}"
@@ -150,6 +152,7 @@ class BaseNode(Node):
                 sock.value = getattr(self, attr)
             except Exception:
                 pass
+        self.update_socket_values()
         self.update_sockets()
 
     def update_sockets(self, _context=None):
@@ -160,4 +163,14 @@ class BaseNode(Node):
                 sock = self.inputs.get(label)
                 if sock:
                     sock.hide = not getattr(self, expose_prop)
+
+    def update_socket_values(self, _context=None):
+        cls = self.__class__
+        for attr, label, _socket in getattr(cls, '_prop_defs', []):
+            sock = self.inputs.get(label)
+            if sock and hasattr(sock, 'value'):
+                try:
+                    sock.value = getattr(self, attr)
+                except Exception:
+                    pass
 
