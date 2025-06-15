@@ -228,6 +228,37 @@ def _evaluate_property_node(node, _inputs, scene):
     return node.scene_nodes_output
 
 
+def _socket_value_direct(sock, default=None):
+    if sock is None:
+        return default
+    if sock.is_linked and sock.links:
+        return getattr(sock.links[0].from_socket, "value", default)
+    return getattr(sock, "value", default)
+
+
+def _evaluate_render_settings(node, _inputs, scene):
+    scene.render.engine = node.engine
+    path = node.engine_path_map.get(node.engine, [])
+    target = scene
+    for attr in path:
+        target = getattr(target, attr, None)
+        if target is None:
+            node.scene_nodes_output = scene.collection
+            return node.scene_nodes_output
+
+    for pref_attr, rna_attr, _label, _sid, eng in node.__class__._engine_prop_defs:
+        if eng != node.engine:
+            continue
+        sock = node._property_sockets.get(pref_attr)
+        val = _socket_value_direct(sock, getattr(node, pref_attr, None))
+        try:
+            setattr(target, rna_attr, val)
+        except Exception:
+            pass
+
+    node.scene_nodes_output = scene.collection
+    return node.scene_nodes_output
+
 def _evaluate_input(node, _inputs, _scene):
     node.scene_nodes_output = None
     return None
@@ -245,8 +276,7 @@ _NODE_EVALUATORS = {
     "LightNodeType": _evaluate_light,
     "GlobalOptionsNodeType": _evaluate_global_options,
     "OutputsStubNodeType": _evaluate_outputs_stub,
-    "RenderCyclesNodeType": _evaluate_property_node,
-    "RenderEeveeNodeType": _evaluate_property_node,
+    "RenderSettingsNodeType": _evaluate_render_settings,
     "OutputPropertiesNodeType": _evaluate_property_node,
     "ScenePropertiesNodeType": _evaluate_property_node,
     "SceneOutputNodeType": _evaluate_scene_output,
