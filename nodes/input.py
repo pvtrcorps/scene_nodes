@@ -32,8 +32,15 @@ class InputNode(BaseNode):
     vector_val: bpy.props.FloatVectorProperty(size=3, update=lambda self, ctx: self.update_socket_value())
     string_val: bpy.props.StringProperty(update=lambda self, ctx: self.update_socket_value())
 
+    expose_output: bpy.props.BoolProperty(
+        name="Expose Output",
+        default=True,
+        update=lambda self, ctx: self.update_socket_visibility(),
+    )
+
     def init(self, context):
         self.update_socket()
+        self.update_socket_visibility()
 
     def update_socket(self):
         while self.outputs:
@@ -48,6 +55,7 @@ class InputNode(BaseNode):
         stype = type_map.get(self.data_type, 'FloatSocketType')
         self.outputs.new(stype, "Value")
         self.update_socket_value()
+        self.update_socket_visibility()
 
     def update_socket_value(self):
         if not self.outputs:
@@ -65,14 +73,8 @@ class InputNode(BaseNode):
             sock.value = self.string_val
 
     def draw_buttons(self, context, layout):
-        layout.prop(self, "data_type")
-        if self.data_type == 'FLOAT':
-            layout.prop(self, "float_val", text="Value")
-        elif self.data_type == 'INT':
-            layout.prop(self, "int_val", text="Value")
-        elif self.data_type == 'BOOL':
-            layout.prop(self, "bool_val", text="Value")
-        elif self.data_type == 'VECTOR':
-            layout.prop(self, "vector_val", text="Value")
-        elif self.data_type == 'STRING':
-            layout.prop(self, "string_val", text="Value")
+        pass
+
+    def update_socket_visibility(self):
+        if self.outputs:
+            self.outputs[0].hide = not self.expose_output

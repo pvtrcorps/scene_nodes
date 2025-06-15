@@ -105,6 +105,7 @@ def build_props_and_sockets(cls, descriptors):
         directly to ``bpy.props``.
     """
     cls._prop_defs = []
+    cls._expose_prop_map = {}
     categories = []
     for desc in descriptors:
         if len(desc) == 3:
@@ -120,6 +121,17 @@ def build_props_and_sockets(cls, descriptors):
         prop_fn, socket_id = PROPERTY_SOCKET_MAP[typ]
         setattr(cls, attr, prop_fn(**kwargs))
         label = kwargs.get('name', attr)
+        expose_prop = f"expose_{_sanitize(attr)}"
+        setattr(
+            cls,
+            expose_prop,
+            bpy.props.BoolProperty(
+                name=f"Expose {label}",
+                default=False,
+                update=BaseNode.update_sockets,
+            ),
+        )
+        cls._expose_prop_map[attr] = expose_prop
         cls._prop_defs.append((attr, label, socket_id, category))
 
     cls._categories = categories
@@ -148,7 +160,21 @@ class BaseNode(Node):
             else:
                 attr, label, socket, _category = info
             sock = self.inputs.new(socket, label)
+            expose_prop = self.__class__._expose_prop_map.get(attr)
+            if expose_prop:
+                sock.hide = not getattr(self, expose_prop)
             try:
                 sock.value = getattr(self, attr)
             except Exception:
                 pass
+        self.update_sockets()
+
+    def update_sockets(self, _context=None):
+        cls = self.__class__
+        for attr, label, _socket, _cat in getattr(cls, '_prop_defs', []):
+            expose_prop = cls._expose_prop_map.get(attr)
+            if expose_prop:
+                sock = self.inputs.get(label)
+                if sock:
+                    sock.hide = not getattr(self, expose_prop)
+
