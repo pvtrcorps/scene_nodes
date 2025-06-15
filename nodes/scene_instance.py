@@ -3,7 +3,6 @@ from .base import (
     BaseNode,
     SceneSocket,
     StringSocket,
-    BoolSocket,
 )
 
 class SceneInstanceNode(BaseNode):
@@ -12,15 +11,24 @@ class SceneInstanceNode(BaseNode):
 
     file_path: bpy.props.StringProperty(name="File Path", subtype='FILE_PATH')
     collection_path: bpy.props.StringProperty(name="Collection Path")
-    as_override: bpy.props.BoolProperty(name="As Override", default=False)
+    load_mode: bpy.props.EnumProperty(
+        name="Load Mode",
+        items=[
+            ('APPEND', "Append", "Append the collection"),
+            ('INSTANCE', "Instance", "Append collection and create instance object"),
+            ('LINK', "Link", "Link the collection"),
+            ('OVERRIDE', "Link Override", "Link the collection and create a library override"),
+        ],
+        default='APPEND'
+    )
 
     def init(self, context):
         fp = self.inputs.new('StringSocketType', "File Path")
         fp.value = self.file_path
         cp = self.inputs.new('StringSocketType', "Collection Path")
         cp.value = self.collection_path
-        ov = self.inputs.new('BoolSocketType', "As Override")
-        ov.value = self.as_override
+        lm = self.inputs.new('StringSocketType', "Load Mode")
+        lm.value = self.load_mode
         self.outputs.new('SceneSocketType', "Scene")
 
     def draw_buttons(self, context, layout):

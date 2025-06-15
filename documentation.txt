@@ -45,7 +45,7 @@ A continuación se describen los nodos incluidos y sus propiedades más relevant
 Crea una instancia de otro archivo `.blend`.
 - **File Path**: ruta del archivo.
 - **Collection Path**: colección dentro del archivo a instanciar.
-- **As Override**: si se debe cargar como override.
+- **Load Mode**: `Append`, `Instance`, `Link` o `Link Override`.
 
 ### Transform
 Aplica transformaciones básicas.
