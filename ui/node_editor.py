@@ -8,6 +8,7 @@ class SCENE_GRAPH_MT_add(Menu):
         layout = self.layout
         layout.operator("node.add_node", text="Scene Instance").type = "SceneInstanceNodeType"
         layout.operator("node.add_node", text="Transform").type = "TransformNodeType"
+        layout.operator("node.add_node", text="Input").type = "InputNodeType"
         layout.operator("node.add_node", text="Group").type = "GroupNodeType"
         layout.operator("node.add_node", text="Light").type = "LightNodeType"
         layout.operator("node.add_node", text="Global Options").type = "GlobalOptionsNodeType"

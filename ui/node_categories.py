@@ -10,6 +10,7 @@ node_categories = [
     SceneNodeCategory('SCENE_NODES', "Scene Nodes", items=[
         NodeItem("SceneInstanceNodeType"),
         NodeItem("TransformNodeType"),
+        NodeItem("InputNodeType"),
         NodeItem("GroupNodeType"),
         NodeItem("LightNodeType"),
         NodeItem("GlobalOptionsNodeType"),
