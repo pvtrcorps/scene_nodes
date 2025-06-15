@@ -75,12 +75,13 @@ def _collect_input_scenes(node):
 def _evaluate_scene_instance(node, _inputs, scene):
     filepath = _socket_value(node, "File Path", getattr(node, "file_path", ""))
     collection_path = _socket_value(node, "Collection Path", getattr(node, "collection_path", ""))
-    as_override = _socket_value(node, "As Override", getattr(node, "as_override", False))
+    load_mode = _socket_value(node, "Load Mode", getattr(node, "load_mode", "APPEND"))
     if not filepath or not collection_path:
         node.scene_nodes_output = None
         return None
 
-    with bpy.data.libraries.load(filepath, link=not as_override) as (data_from, data_to):
+    link = load_mode in {"LINK", "OVERRIDE"}
+    with bpy.data.libraries.load(filepath, link=link) as (data_from, data_to):
         if collection_path in data_from.collections:
             data_to.collections = [collection_path]
 
@@ -89,9 +90,20 @@ def _evaluate_scene_instance(node, _inputs, scene):
         node.scene_nodes_output = None
         return None
 
-    scene.collection.children.link(collection)
-    if as_override:
+    if load_mode != "INSTANCE":
+        scene.collection.children.link(collection)
+
+    if load_mode == "OVERRIDE":
         collection = collection.override_create(scene.collection)
+    elif load_mode == "INSTANCE":
+        # Create a new wrapper collection with a collection instance object
+        wrapper = bpy.data.collections.new(name=f"{collection.name}_instance")
+        scene.collection.children.link(wrapper)
+        inst_obj = bpy.data.objects.new(name=f"{collection.name}_inst", object_data=None)
+        inst_obj.instance_type = 'COLLECTION'
+        inst_obj.instance_collection = collection
+        wrapper.objects.link(inst_obj)
+        collection = wrapper
 
     node.scene_nodes_output = collection
     return collection
