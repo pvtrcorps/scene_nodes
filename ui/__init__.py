@@ -1,12 +1,16 @@
 # ui/__init__.py
 from .node_editor import SCENE_GRAPH_MT_add
 from .operators import NODE_OT_sync_to_scene
-from .node_panel import SCENE_NODES_PT_node_props
+from .node_panel import (
+    SCENE_NODES_PT_node_props,
+    SCENE_NODES_PT_node_props_properties,
+)
 
 __all__ = [
     "SCENE_GRAPH_MT_add",
     "NODE_OT_sync_to_scene",
     "SCENE_NODES_PT_node_props",
+    "SCENE_NODES_PT_node_props_properties",
 ]
 from . import node_editor
 from . import node_panel
