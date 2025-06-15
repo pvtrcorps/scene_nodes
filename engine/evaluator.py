@@ -200,13 +200,31 @@ def _evaluate_outputs_stub(node, _inputs, scene):
     return node.scene_nodes_output
 
 
-def _evaluate_cycles_render(node, _inputs, scene):
-    samples = _socket_value(node, "Samples", getattr(node, "samples", 128))
-    use_denoise = _socket_value(node, "Use Denoise", getattr(node, "use_denoise", False))
+def _camel_to_snake(name):
+    out = ""
+    for c in name:
+        if c.isupper():
+            if out:
+                out += "_"
+            out += c.lower()
+        else:
+            out += c
+    return out
 
-    if hasattr(scene, "cycles"):
-        scene.cycles.samples = samples
-        scene.cycles.use_denoising = use_denoise
+
+def _evaluate_cycles_render(node, _inputs, scene):
+    if not hasattr(scene, "cycles"):
+        node.scene_nodes_output = scene.collection
+        return scene.collection
+
+    for attr, label, _socket, _cat in node.__class__._prop_defs:
+        value = _socket_value(node, label, getattr(node, attr))
+        blender_attr = _camel_to_snake(attr)
+        if hasattr(scene.cycles, blender_attr):
+            try:
+                setattr(scene.cycles, blender_attr, value)
+            except Exception:
+                pass
 
     node.scene_nodes_output = scene.collection
     return node.scene_nodes_output
