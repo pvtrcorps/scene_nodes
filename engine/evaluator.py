@@ -90,20 +90,36 @@ def _evaluate_scene_instance(node, _inputs, scene):
         node.scene_nodes_output = None
         return None
 
-    if load_mode != "INSTANCE":
-        scene.collection.children.link(collection)
-
     if load_mode == "OVERRIDE":
-        collection = collection.override_create(scene.collection)
+        # Link, create override and remove original link to avoid duplicates
+        scene.collection.children.link(collection)
+        overridden = collection.override_create(scene.collection)
+        scene.collection.children.unlink(collection)
+        if collection.users == 0:
+            bpy.data.collections.remove(collection)
+        collection = overridden
     elif load_mode == "INSTANCE":
+        # Remove previous instance wrapper and object if they exist
+        wrapper_name = f"{collection.name}_instance"
+        obj_name = f"{collection.name}_inst"
+        old_wrapper = bpy.data.collections.get(wrapper_name)
+        if old_wrapper:
+            for obj in list(old_wrapper.objects):
+                bpy.data.objects.remove(obj, do_unlink=True)
+            bpy.data.collections.remove(old_wrapper)
+        if obj_name in bpy.data.objects:
+            bpy.data.objects.remove(bpy.data.objects[obj_name], do_unlink=True)
+
         # Create a new wrapper collection with a collection instance object
-        wrapper = bpy.data.collections.new(name=f"{collection.name}_instance")
+        wrapper = bpy.data.collections.new(name=wrapper_name)
         scene.collection.children.link(wrapper)
-        inst_obj = bpy.data.objects.new(name=f"{collection.name}_inst", object_data=None)
+        inst_obj = bpy.data.objects.new(name=obj_name, object_data=None)
         inst_obj.instance_type = 'COLLECTION'
         inst_obj.instance_collection = collection
         wrapper.objects.link(inst_obj)
         collection = wrapper
+    else:
+        scene.collection.children.link(collection)
 
     node.scene_nodes_output = collection
     return collection
