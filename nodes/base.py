@@ -164,6 +164,27 @@ class BaseNode(Node):
         except Exception:
             pass
 
+        # Reorder socket according to property definition order
+        new_index = len(self.inputs) - 1
+        order_map = {
+            lbl: idx
+            for idx, (_a, lbl, _s) in enumerate(
+                getattr(self.__class__, "_prop_defs", [])
+            )
+        }
+        prop_pos = order_map.get(label, new_index)
+        target_index = 0
+        for i, s in enumerate(self.inputs):
+            if s is sock:
+                continue
+            other_pos = order_map.get(s.name)
+            if other_pos is None or other_pos < prop_pos:
+                target_index = i + 1
+            else:
+                break
+        if target_index != new_index:
+            self.inputs.move(new_index, target_index)
+
     def remove_property_socket(self, attr):
         """Remove the socket corresponding to *attr* if present."""
         label, _socket = self._find_prop_def(attr)
