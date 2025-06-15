@@ -104,6 +104,15 @@ def build_props_and_sockets(cls, descriptors):
         setattr(cls, attr, prop_fn(**kwargs))
         label = kwargs.get('name', attr)
         cls._prop_defs.append((attr, label, socket_id))
+        setattr(
+            cls,
+            f"use_{attr}",
+            bpy.props.BoolProperty(
+                name=f"Use {label}",
+                default=True,
+                update=lambda self, ctx, a=attr, sid=socket_id, l=label: self.toggle_property_socket(a, sid, l),
+            ),
+        )
     return cls
 
 
@@ -112,14 +121,31 @@ class BaseNode(Node):
     bl_width_default = 200
 
     def init(self, context):
-        pass  # Definir sockets en cada nodo concreto
+        self._property_sockets = {}
 
     def add_property_sockets(self):
         """Instantiate sockets for the properties defined via
         :func:`build_props_and_sockets`."""
         for attr, label, socket in getattr(self.__class__, '_prop_defs', []):
-            sock = self.inputs.new(socket, label)
+            if getattr(self, f"use_{attr}", True):
+                sock = self.inputs.new(socket, label)
+                self._property_sockets[attr] = sock
+                try:
+                    sock.value = getattr(self, attr)
+                except Exception:
+                    pass
+
+    def toggle_property_socket(self, attr, sid, label):
+        """Add or remove a socket based on ``use_<attr>``."""
+        use = getattr(self, f"use_{attr}")
+        sock = self._property_sockets.get(attr)
+        if use and sock is None:
+            sock = self.inputs.new(sid, label)
+            self._property_sockets[attr] = sock
             try:
                 sock.value = getattr(self, attr)
             except Exception:
                 pass
+        elif not use and sock is not None:
+            self.inputs.remove(sock)
+            del self._property_sockets[attr]

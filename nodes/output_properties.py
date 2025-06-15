@@ -8,6 +8,7 @@ class OutputPropertiesNode(BaseNode):
     property_group_path = ["render"]
 
     def init(self, context):
+        super().init(context)
         self.inputs.new('SceneSocketType', "Scene")
         self.add_property_sockets()
         self.outputs.new('SceneSocketType', "Scene")

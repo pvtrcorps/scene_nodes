@@ -6,6 +6,7 @@ class OutputsStubNode(BaseNode):
     bl_label = "Render Outputs"
 
     def init(self, context):
+        super().init(context)
         self.inputs.new('SceneSocketType', "Scene")
         self.add_property_sockets()
         self.outputs.new('SceneSocketType', "Scene")
