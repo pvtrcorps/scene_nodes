@@ -17,11 +17,10 @@ class SCENE_GRAPH_PT_node_properties(bpy.types.Panel):
         cls = node.__class__
         if getattr(cls, '_prop_defs', []):
             for attr, label, _socket, *_ in getattr(cls, '_prop_defs', []):
-                row = layout.row()
-                row.prop(node, attr, text=label)
                 expose = cls._expose_prop_map.get(attr)
                 if expose:
-                    row.prop(node, expose, text='Socket')
+                    row = layout.row()
+                    row.prop(node, expose, text=label)
         else:
             if hasattr(node, 'data_type'):
                 layout.prop(node, 'data_type')
