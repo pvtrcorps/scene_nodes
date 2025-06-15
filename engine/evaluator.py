@@ -91,10 +91,7 @@ def _evaluate_scene_instance(node, _inputs, scene):
 
     scene.collection.children.link(collection)
     if as_override:
-        collection = collection.override_create(
-            scene.collection,
-            remap_local_usages=True,
-        )
+        collection = collection.override_create(scene.collection)
 
     node.scene_nodes_output = collection
     return collection
