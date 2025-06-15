@@ -86,12 +86,6 @@ PROPERTY_SOCKET_MAP = {
 }
 
 
-def _sanitize(name):
-    """Return a valid identifier for ``name``."""
-    import re
-    return re.sub(r"[^0-9a-zA-Z_]", "_", name).lower()
-
-
 def build_props_and_sockets(cls, descriptors):
     """Create node properties and remember socket information.
 
@@ -105,31 +99,11 @@ def build_props_and_sockets(cls, descriptors):
         directly to ``bpy.props``.
     """
     cls._prop_defs = []
-    cls._expose_prop_map = {}
-    for desc in descriptors:
-        if len(desc) < 3:
-            raise ValueError("Invalid property descriptor")
-        attr, typ, kwargs = desc[:3]
-        category = desc[3] if len(desc) > 3 else None
-
+    for attr, typ, kwargs in descriptors:
         prop_fn, socket_id = PROPERTY_SOCKET_MAP[typ]
-        kwargs = dict(kwargs)
-        kwargs['update'] = BaseNode.update_socket_values
         setattr(cls, attr, prop_fn(**kwargs))
         label = kwargs.get('name', attr)
-        expose_prop = f"expose_{_sanitize(attr)}"
-        setattr(
-            cls,
-            expose_prop,
-            bpy.props.BoolProperty(
-                name=f"Expose {label}",
-                default=False,
-                update=BaseNode.update_sockets,
-            ),
-        )
-        cls._expose_prop_map[attr] = expose_prop
-        cls._prop_defs.append((attr, label, socket_id, category))
-
+        cls._prop_defs.append((attr, label, socket_id))
     return cls
 
 
@@ -143,35 +117,9 @@ class BaseNode(Node):
     def add_property_sockets(self):
         """Instantiate sockets for the properties defined via
         :func:`build_props_and_sockets`."""
-        for info in getattr(self.__class__, '_prop_defs', []):
-            attr, label, socket, *_ = info
+        for attr, label, socket in getattr(self.__class__, '_prop_defs', []):
             sock = self.inputs.new(socket, label)
-            expose_prop = self.__class__._expose_prop_map.get(attr)
-            if expose_prop:
-                sock.hide = not getattr(self, expose_prop)
             try:
                 sock.value = getattr(self, attr)
             except Exception:
                 pass
-        self.update_socket_values()
-        self.update_sockets()
-
-    def update_sockets(self, _context=None):
-        cls = self.__class__
-        for attr, label, _socket, *_ in getattr(cls, '_prop_defs', []):
-            expose_prop = cls._expose_prop_map.get(attr)
-            if expose_prop:
-                sock = self.inputs.get(label)
-                if sock:
-                    sock.hide = not getattr(self, expose_prop)
-
-    def update_socket_values(self, _context=None):
-        cls = self.__class__
-        for attr, label, _socket in getattr(cls, '_prop_defs', []):
-            sock = self.inputs.get(label)
-            if sock and hasattr(sock, 'value'):
-                try:
-                    sock.value = getattr(self, attr)
-                except Exception:
-                    pass
-
