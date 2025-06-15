@@ -28,6 +28,4 @@ class LightNode(BaseNode):
         self.outputs.new('SceneSocketType', "Scene")
 
     def draw_buttons(self, context, layout):
-        layout.prop(self.inputs["Type"], "value")
-        layout.prop(self.inputs["Energy"], "value")
-        layout.prop(self.inputs["Color"], "value")
+        pass  # Inputs already expose editable values next to their sockets

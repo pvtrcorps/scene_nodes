@@ -28,7 +28,4 @@ class GlobalOptionsNode(BaseNode):
         self.outputs.new('SceneSocketType', "Scene")
 
     def draw_buttons(self, context, layout):
-        layout.prop(self.inputs["Resolution X"], "value")
-        layout.prop(self.inputs["Resolution Y"], "value")
-        layout.prop(self.inputs["Samples"], "value")
-        layout.prop(self.inputs["Camera Path"], "value")
+        pass  # Inputs already expose editable values next to their sockets
