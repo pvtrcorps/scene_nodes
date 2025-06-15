@@ -74,7 +74,10 @@ def _evaluate_scene_instance(node, _inputs):
 
     bpy.context.scene.collection.children.link(collection)
     if as_override:
-        collection = collection.override_create(bpy.context.scene.collection)
+        collection = collection.override_create(
+            bpy.context.scene.collection,
+            remap_local_usages=True,
+        )
 
     node.scene_nodes_output = collection
     return collection
