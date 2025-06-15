@@ -200,6 +200,11 @@ def _evaluate_outputs_stub(node, _inputs, scene):
     return node.scene_nodes_output
 
 
+def _evaluate_input(node, _inputs, _scene):
+    node.scene_nodes_output = None
+    return None
+
+
 def _evaluate_node(node, scene):
     inputs = _collect_input_scenes(node)
     ntype = node.bl_idname
@@ -215,6 +220,8 @@ def _evaluate_node(node, scene):
         return _evaluate_global_options(node, inputs, scene)
     elif ntype == "OutputsStubNodeType":
         return _evaluate_outputs_stub(node, inputs, scene)
+    elif ntype == "InputNodeType":
+        return _evaluate_input(node, inputs, scene)
     else:
         print(f"[scene_nodes] unknown node type {ntype}")
 
