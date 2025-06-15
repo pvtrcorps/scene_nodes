@@ -93,7 +93,8 @@ de lo contrario utilizará el valor interno editable en el propio nodo.
 Para controlar qué sockets se muestran, selecciona un nodo y abre la barra
 lateral del Node Editor con **N**. En la pestaña **Node** encontrarás el panel
 **Node Properties** con casillas "Use ..." que activan o desactivan los
-sockets correspondientes.
+sockets correspondientes. Si el socket está activo pero sin ninguna conexión,
+su valor puede modificarse directamente desde este panel.
 
 Flujo de trabajo recomendado
 ---------------------------
