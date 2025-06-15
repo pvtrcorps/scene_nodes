@@ -99,20 +99,22 @@ def build_props_and_sockets(cls, descriptors):
         directly to ``bpy.props``.
     """
     cls._prop_defs = []
+    if not hasattr(cls, "__annotations__"):
+        cls.__annotations__ = {}
     for attr, typ, kwargs in descriptors:
         prop_fn, socket_id = PROPERTY_SOCKET_MAP[typ]
-        setattr(cls, attr, prop_fn(**kwargs))
+        prop = prop_fn(**kwargs)
+        setattr(cls, attr, prop)
+        cls.__annotations__[attr] = prop
         label = kwargs.get('name', attr)
         cls._prop_defs.append((attr, label, socket_id))
-        setattr(
-            cls,
-            f"use_{attr}",
-            bpy.props.BoolProperty(
-                name=f"Use {label}",
-                default=True,
-                update=lambda self, ctx, a=attr, sid=socket_id, l=label: self.toggle_property_socket(a, sid, l),
-            ),
+        bool_prop = bpy.props.BoolProperty(
+            name=f"Use {label}",
+            default=True,
+            update=lambda self, ctx, a=attr, sid=socket_id, l=label: self.toggle_property_socket(a, sid, l),
         )
+        setattr(cls, f"use_{attr}", bool_prop)
+        cls.__annotations__[f"use_{attr}"] = bool_prop
     return cls
 
 
