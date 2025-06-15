@@ -60,17 +60,23 @@ def _build_engine_props(cls, engine, rna_struct):
     return cls
 
 
-_build_engine_props(
-    RenderSettingsNode,
-    'CYCLES',
-    bpy.types.CyclesRenderSettings
-    if hasattr(bpy.types, 'CyclesRenderSettings')
-    else bpy.types.Scene.cycles.__class__,
-)
-_build_engine_props(
-    RenderSettingsNode,
-    'BLENDER_EEVEE',
-    bpy.types.EeveeRenderSettings if hasattr(bpy.types, 'EeveeRenderSettings') else bpy.types.Scene.eevee.__class__,
-)
+def _resolve_settings_struct(prop_name, fallback):
+    cls = getattr(bpy.types, fallback, None)
+    if cls is None:
+        prop = bpy.types.Scene.bl_rna.properties.get(prop_name)
+        if prop is not None and hasattr(prop, "fixed_type"):
+            ident = getattr(prop.fixed_type, "identifier", None)
+            if ident:
+                cls = getattr(bpy.types, ident, None)
+    return cls
+
+
+cycles_struct = _resolve_settings_struct("cycles", "CyclesRenderSettings")
+if cycles_struct is not None:
+    _build_engine_props(RenderSettingsNode, 'CYCLES', cycles_struct)
+
+eevee_struct = _resolve_settings_struct("eevee", "EeveeRenderSettings")
+if eevee_struct is not None:
+    _build_engine_props(RenderSettingsNode, 'BLENDER_EEVEE', eevee_struct)
 
 __all__ = ["RenderSettingsNode"]
