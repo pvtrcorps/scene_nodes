@@ -105,6 +105,7 @@ def build_props_and_sockets(cls, descriptors):
         directly to ``bpy.props``.
     """
     cls._prop_defs = []
+    cls._expose_prop_map = {}
     categories = []
     for desc in descriptors:
         if len(desc) == 3:
@@ -120,6 +121,17 @@ def build_props_and_sockets(cls, descriptors):
         prop_fn, socket_id = PROPERTY_SOCKET_MAP[typ]
         setattr(cls, attr, prop_fn(**kwargs))
         label = kwargs.get('name', attr)
+        expose_prop = f"expose_{_sanitize(attr)}"
+        setattr(
+            cls,
+            expose_prop,
+            bpy.props.BoolProperty(
+                name=f"Expose {label}",
+                default=False,
+                update=BaseNode.update_sockets,
+            ),
+        )
+        cls._expose_prop_map[attr] = expose_prop
         cls._prop_defs.append((attr, label, socket_id, category))
 
     cls._categories = categories
@@ -137,18 +149,30 @@ class BaseNode(Node):
     bl_width_default = 200
 
     def init(self, context):
-        pass  # Definir sockets en cada nodo concreto
+        """Override in subclasses to create mandatory sockets."""
+        pass
 
     def add_property_sockets(self):
-        """Instantiate sockets for the properties defined via
-        :func:`build_props_and_sockets`."""
-        for info in getattr(self.__class__, '_prop_defs', []):
-            if len(info) == 3:
-                attr, label, socket = info
+        """Ensure sockets for exposed properties exist."""
+        self.update_sockets()
+
+    def update_sockets(self, _context=None):
+        """Create or remove sockets based on expose toggles."""
+        cls = self.__class__
+        for attr, label, socket_id, _cat in getattr(cls, '_prop_defs', []):
+            expose_prop = cls._expose_prop_map.get(attr)
+            if not expose_prop:
+                continue
+            exposed = getattr(self, expose_prop)
+            sock = self.inputs.get(label)
+            if exposed:
+                if sock is None:
+                    sock = self.inputs.new(socket_id, label)
+                    try:
+                        sock.value = getattr(self, attr)
+                    except Exception:
+                        pass
             else:
-                attr, label, socket, _category = info
-            sock = self.inputs.new(socket, label)
-            try:
-                sock.value = getattr(self, attr)
-            except Exception:
-                pass
+                if sock is not None:
+                    self.inputs.remove(sock)
+

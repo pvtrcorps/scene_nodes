@@ -61,6 +61,20 @@ def _socket_value(node, name, default=None):
     return getattr(sock, "value", default)
 
 
+def _is_exposed(node, attr):
+    expose_map = getattr(node.__class__, '_expose_prop_map', {})
+    expose_prop = expose_map.get(attr)
+    if expose_prop is None:
+        return True
+    return getattr(node, expose_prop)
+
+
+def _get_exposed_value(node, label, attr, default=None):
+    if not _is_exposed(node, attr):
+        return None
+    return _socket_value(node, label, getattr(node, attr, default))
+
+
 def _collect_input_scenes(node):
     """Gather evaluated scenes from linked inputs."""
     scenes = []
@@ -73,9 +87,13 @@ def _collect_input_scenes(node):
 
 
 def _evaluate_scene_instance(node, _inputs, scene):
-    filepath = _socket_value(node, "File Path", getattr(node, "file_path", ""))
-    collection_path = _socket_value(node, "Collection Path", getattr(node, "collection_path", ""))
-    load_mode = _socket_value(node, "Load Mode", getattr(node, "load_mode", "APPEND"))
+    if not _is_exposed(node, "file_path") or not _is_exposed(node, "collection_path"):
+        node.scene_nodes_output = None
+        return None
+
+    filepath = _get_exposed_value(node, "File Path", "file_path", "")
+    collection_path = _get_exposed_value(node, "Collection Path", "collection_path", "")
+    load_mode = _get_exposed_value(node, "Load Mode", "load_mode", "APPEND") or "APPEND"
     if not filepath or not collection_path:
         node.scene_nodes_output = None
         return None
@@ -126,17 +144,24 @@ def _evaluate_scene_instance(node, _inputs, scene):
 
 
 def _evaluate_transform(node, inputs):
-    t = Vector(_socket_value(node, "Translate", getattr(node, "translate", (0.0, 0.0, 0.0))))
-    r = Vector(_socket_value(node, "Rotate", getattr(node, "rotate", (0.0, 0.0, 0.0))))
-    s = Vector(_socket_value(node, "Scale", getattr(node, "scale", (1.0, 1.0, 1.0))))
+    t_val = _get_exposed_value(node, "Translate", "translate", (0.0, 0.0, 0.0))
+    r_val = _get_exposed_value(node, "Rotate", "rotate", (0.0, 0.0, 0.0))
+    s_val = _get_exposed_value(node, "Scale", "scale", (1.0, 1.0, 1.0))
+
+    t = Vector(t_val) if t_val is not None else None
+    r = Vector(r_val) if r_val is not None else None
+    s = Vector(s_val) if s_val is not None else None
 
     for coll in inputs:
         if coll is None:
             continue
         for obj in coll.objects:
-            obj.location = Vector(obj.location) + t
-            obj.rotation_euler = Vector(obj.rotation_euler) + r
-            obj.scale = Vector(obj.scale) * s
+            if t is not None:
+                obj.location = Vector(obj.location) + t
+            if r is not None:
+                obj.rotation_euler = Vector(obj.rotation_euler) + r
+            if s is not None:
+                obj.scale = Vector(obj.scale) * s
 
     node.scene_nodes_output = inputs[0] if inputs else None
     return node.scene_nodes_output
@@ -157,9 +182,13 @@ def _evaluate_group(node, inputs, scene):
 
 
 def _evaluate_light(node, _inputs, scene):
-    ltype = _socket_value(node, "Type", getattr(node, "light_type", "POINT"))
-    energy = _socket_value(node, "Energy", getattr(node, "energy", 1.0))
-    color = _socket_value(node, "Color", getattr(node, "color", (1.0, 1.0, 1.0)))
+    ltype = _get_exposed_value(node, "Type", "light_type", "POINT") or "POINT"
+    energy = _get_exposed_value(node, "Energy", "energy", 1.0)
+    color = _get_exposed_value(node, "Color", "color", (1.0, 1.0, 1.0))
+
+    if ltype is None:
+        node.scene_nodes_output = scene.collection
+        return scene.collection
 
     light_data = bpy.data.lights.new(name=node.name, type=ltype)
     light_data.energy = energy
@@ -173,16 +202,19 @@ def _evaluate_light(node, _inputs, scene):
 
 
 def _evaluate_global_options(node, _inputs, scene):
-    res_x = _socket_value(node, "Resolution X", getattr(node, "res_x", 1920))
-    res_y = _socket_value(node, "Resolution Y", getattr(node, "res_y", 1080))
-    samples = _socket_value(node, "Samples", getattr(node, "samples", 128))
-    camera_path = _socket_value(node, "Camera Path", getattr(node, "camera_path", ""))
+    res_x = _get_exposed_value(node, "Resolution X", "res_x", 1920)
+    res_y = _get_exposed_value(node, "Resolution Y", "res_y", 1080)
+    samples = _get_exposed_value(node, "Samples", "samples", 128)
+    camera_path = _get_exposed_value(node, "Camera Path", "camera_path", "")
 
-    scene.render.resolution_x = res_x
-    scene.render.resolution_y = res_y
-    scene.cycles.samples = samples if hasattr(scene, "cycles") else samples
+    if res_x is not None:
+        scene.render.resolution_x = res_x
+    if res_y is not None:
+        scene.render.resolution_y = res_y
+    if samples is not None:
+        scene.cycles.samples = samples if hasattr(scene, "cycles") else samples
 
-    if camera_path in bpy.data.objects:
+    if camera_path and camera_path in bpy.data.objects:
         scene.camera = bpy.data.objects[camera_path]
 
     node.scene_nodes_output = scene.collection
@@ -190,11 +222,13 @@ def _evaluate_global_options(node, _inputs, scene):
 
 
 def _evaluate_outputs_stub(node, _inputs, scene):
-    path = _socket_value(node, "File Path", getattr(node, "filepath", ""))
-    fmt = _socket_value(node, "Format", getattr(node, "file_format", "OPEN_EXR"))
+    path = _get_exposed_value(node, "File Path", "filepath", "")
+    fmt = _get_exposed_value(node, "Format", "file_format", "OPEN_EXR")
 
-    scene.render.filepath = path
-    scene.render.image_settings.file_format = fmt
+    if path is not None:
+        scene.render.filepath = path
+    if fmt is not None:
+        scene.render.image_settings.file_format = fmt
 
     node.scene_nodes_output = scene.collection
     return node.scene_nodes_output
@@ -218,9 +252,11 @@ def _evaluate_cycles_render(node, _inputs, scene):
         return scene.collection
 
     for attr, label, _socket, _cat in node.__class__._prop_defs:
-        value = _socket_value(node, label, getattr(node, attr))
+        if not _is_exposed(node, attr):
+            continue
+        value = _get_exposed_value(node, label, attr)
         blender_attr = _camel_to_snake(attr)
-        if hasattr(scene.cycles, blender_attr):
+        if hasattr(scene.cycles, blender_attr) and value is not None:
             try:
                 setattr(scene.cycles, blender_attr, value)
             except Exception:
@@ -231,27 +267,33 @@ def _evaluate_cycles_render(node, _inputs, scene):
 
 
 def _evaluate_eevee_render(node, _inputs, scene):
-    samples = _socket_value(node, "Samples", getattr(node, "samples", 64))
-    use_bloom = _socket_value(node, "Bloom", getattr(node, "use_bloom", False))
+    samples = _get_exposed_value(node, "Samples", "samples", 64)
+    use_bloom = _get_exposed_value(node, "Bloom", "use_bloom", False)
 
     if hasattr(scene, "eevee"):
-        scene.eevee.taa_render_samples = samples
-        scene.eevee.use_bloom = use_bloom
+        if samples is not None:
+            scene.eevee.taa_render_samples = samples
+        if use_bloom is not None:
+            scene.eevee.use_bloom = use_bloom
 
     node.scene_nodes_output = scene.collection
     return node.scene_nodes_output
 
 
 def _evaluate_output_properties(node, _inputs, scene):
-    path = _socket_value(node, "File Path", getattr(node, "filepath", ""))
-    fmt = _socket_value(node, "Format", getattr(node, "file_format", "OPEN_EXR"))
-    res_x = _socket_value(node, "Resolution X", getattr(node, "res_x", 1920))
-    res_y = _socket_value(node, "Resolution Y", getattr(node, "res_y", 1080))
+    path = _get_exposed_value(node, "File Path", "filepath", "")
+    fmt = _get_exposed_value(node, "Format", "file_format", "OPEN_EXR")
+    res_x = _get_exposed_value(node, "Resolution X", "res_x", 1920)
+    res_y = _get_exposed_value(node, "Resolution Y", "res_y", 1080)
 
-    scene.render.filepath = path
-    scene.render.image_settings.file_format = fmt
-    scene.render.resolution_x = res_x
-    scene.render.resolution_y = res_y
+    if path is not None:
+        scene.render.filepath = path
+    if fmt is not None:
+        scene.render.image_settings.file_format = fmt
+    if res_x is not None:
+        scene.render.resolution_x = res_x
+    if res_y is not None:
+        scene.render.resolution_y = res_y
 
     node.scene_nodes_output = scene.collection
     return node.scene_nodes_output
