@@ -64,7 +64,11 @@ NODETREE_CATEGORY = 'SCENE_NODES'
 
 def register():
     for cls in classes:
-        bpy.utils.register_class(cls)
+        try:
+            bpy.utils.register_class(cls)
+        except ValueError:
+            bpy.utils.unregister_class(cls)
+            bpy.utils.register_class(cls)
     register_node_categories(NODETREE_CATEGORY, node_categories)
     ui.register()
 
