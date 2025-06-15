@@ -33,7 +33,7 @@ tree = bpy.data.node_groups.new("Example", "SceneNodeTreeType")
 
 # Add nodes
 inst = tree.nodes.new("SceneInstanceNodeType")
-out = tree.nodes.new("OutputsStubNodeType")
+out = tree.nodes.new("OutputPropertiesNodeType")
 
 # Link instance to output
 tree.links.new(inst.outputs[0], out.inputs[0])
@@ -41,3 +41,7 @@ tree.links.new(inst.outputs[0], out.inputs[0])
 # Evaluate the tree (applies changes to the scene)
 evaluate_scene_tree(tree)
 ```
+
+## Migration
+
+Global Options and Render Outputs nodes have been replaced by **Scene Properties**, **Render Properties** and **Output Properties**. Update existing trees by inserting the new nodes in place of the old ones.

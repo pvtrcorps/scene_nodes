@@ -238,6 +238,50 @@ def _evaluate_global_options(node, _inputs, scene):
     return node.scene_nodes_output
 
 
+def _evaluate_scene_properties(node, _inputs, scene):
+    if getattr(node, "use_res_x", False):
+        res_x = _socket_value(node, "Resolution X", getattr(node, "res_x", 1920))
+        scene.render.resolution_x = res_x
+
+    if getattr(node, "use_res_y", False):
+        res_y = _socket_value(node, "Resolution Y", getattr(node, "res_y", 1080))
+        scene.render.resolution_y = res_y
+
+    if getattr(node, "use_camera_path", False):
+        camera_path = _socket_value(node, "Camera Path", getattr(node, "camera_path", ""))
+        if camera_path in bpy.data.objects:
+            scene.camera = bpy.data.objects[camera_path]
+
+    node.scene_nodes_output = scene.collection
+    return node.scene_nodes_output
+
+
+def _evaluate_render_properties(node, _inputs, scene):
+    if getattr(node, "use_engine", False):
+        engine = _socket_value(node, "Engine", getattr(node, "engine", "BLENDER_EEVEE"))
+        scene.render.engine = engine
+
+    if getattr(node, "use_samples", False):
+        samples = _socket_value(node, "Samples", getattr(node, "samples", 128))
+        scene.cycles.samples = samples if hasattr(scene, "cycles") else samples
+
+    node.scene_nodes_output = scene.collection
+    return node.scene_nodes_output
+
+
+def _evaluate_output_properties(node, _inputs, scene):
+    if getattr(node, "use_filepath", False):
+        path = _socket_value(node, "File Path", getattr(node, "filepath", ""))
+        scene.render.filepath = path
+
+    if getattr(node, "use_file_format", False):
+        fmt = _socket_value(node, "Format", getattr(node, "file_format", "OPEN_EXR"))
+        scene.render.image_settings.file_format = fmt
+
+    node.scene_nodes_output = scene.collection
+    return node.scene_nodes_output
+
+
 def _evaluate_outputs_stub(node, _inputs, scene):
     if getattr(node, "use_filepath", False):
         path = _socket_value(node, "File Path", getattr(node, "filepath", ""))
@@ -273,6 +317,12 @@ def _evaluate_node(node, scene):
         return _evaluate_light(node, inputs, scene)
     elif ntype == "GlobalOptionsNodeType":
         return _evaluate_global_options(node, inputs, scene)
+    elif ntype == "ScenePropertiesNodeType":
+        return _evaluate_scene_properties(node, inputs, scene)
+    elif ntype == "RenderPropertiesNodeType":
+        return _evaluate_render_properties(node, inputs, scene)
+    elif ntype == "OutputPropertiesNodeType":
+        return _evaluate_output_properties(node, inputs, scene)
     elif ntype == "OutputsStubNodeType":
         return _evaluate_outputs_stub(node, inputs, scene)
     elif ntype == "SceneOutputNodeType":
