@@ -119,4 +119,7 @@ class BaseNode(Node):
         :func:`build_props_and_sockets`."""
         for attr, label, socket in getattr(self.__class__, '_prop_defs', []):
             sock = self.inputs.new(socket, label)
-            sock.value = getattr(self, attr)
+            try:
+                sock.value = getattr(self, attr)
+            except Exception:
+                pass
