@@ -75,6 +75,10 @@ Establece datos básicos de salida.
 - **File Path**: carpeta o archivo de destino.
 - **Format**: formato de imagen (OpenEXR o PNG).
 
+### Scene Output
+Define el nombre de la escena resultante. Debe situarse al final del 
+árbol y es obligatorio para ejecutar la evaluación.
+
 Conexión de propiedades
 -----------------------
 Los valores mostrados en los nodos también aparecen como sockets de entrada.
@@ -88,8 +92,9 @@ Flujo de trabajo recomendado
 2. Añade instancias o grupos según sea necesario.
 3. Inserta nodos **Transform** para posicionar los elementos.
 4. Utiliza **Light** para iluminar.
-5. Finaliza con **Render Outputs** para definir la salida.
-6. Ejecuta **Sync to Scene** para aplicar los cambios.
+5. Añade un nodo **Render Outputs** si necesitas configurar la salida.
+6. Cierra el árbol con **Scene Output** para crear la escena.
+7. Ejecuta **Sync to Scene** para aplicar los cambios.
 
 Ten en cuenta que este complemento sigue siendo experimental, pero ahora la
 evaluación del árbol aplica los cambios directamente en la escena de Blender en
