@@ -72,6 +72,16 @@ def _collect_input_scenes(node):
     return scenes
 
 
+def _apply_node_properties(node, target):
+    """Copy dynamic properties from *node* to *target*."""
+    for attr, label, _ in getattr(node.__class__, '_prop_defs', []):
+        val = _socket_value(node, label, getattr(node, attr, None))
+        try:
+            setattr(target, attr, val)
+        except Exception:
+            pass
+
+
 def _evaluate_scene_instance(node, _inputs, scene):
     filepath = _socket_value(node, "File Path", getattr(node, "file_path", ""))
     collection_path = _socket_value(node, "Collection Path", getattr(node, "collection_path", ""))
@@ -206,6 +216,18 @@ def _evaluate_outputs_stub(node, _inputs, scene):
     return node.scene_nodes_output
 
 
+def _evaluate_property_node(node, _inputs, scene):
+    target = scene
+    for attr in getattr(node.__class__, 'property_group_path', []):
+        target = getattr(target, attr, None)
+        if target is None:
+            node.scene_nodes_output = scene.collection
+            return node.scene_nodes_output
+    _apply_node_properties(node, target)
+    node.scene_nodes_output = scene.collection
+    return node.scene_nodes_output
+
+
 def _evaluate_input(node, _inputs, _scene):
     node.scene_nodes_output = None
     return None
@@ -223,6 +245,10 @@ _NODE_EVALUATORS = {
     "LightNodeType": _evaluate_light,
     "GlobalOptionsNodeType": _evaluate_global_options,
     "OutputsStubNodeType": _evaluate_outputs_stub,
+    "RenderCyclesNodeType": _evaluate_property_node,
+    "RenderEeveeNodeType": _evaluate_property_node,
+    "OutputPropertiesNodeType": _evaluate_property_node,
+    "ScenePropertiesNodeType": _evaluate_property_node,
     "SceneOutputNodeType": _evaluate_scene_output,
     "InputNodeType": _evaluate_input,
 }
