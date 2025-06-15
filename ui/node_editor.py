@@ -2,6 +2,7 @@ import bpy
 from bpy.types import Menu
 
 class SCENE_GRAPH_MT_add(Menu):
+    bl_idname = "SCENE_GRAPH_MT_add"
     bl_label = "Add Scene Node"
 
     def draw(self, context):
