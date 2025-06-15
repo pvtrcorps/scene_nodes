@@ -46,6 +46,8 @@ Crea una instancia de otro archivo `.blend`.
 - **File Path**: ruta del archivo.
 - **Collection Path**: colección dentro del archivo a instanciar.
 - **Load Mode**: `Append`, `Instance`, `Link` o `Link Override`.
+- En modo `Instance` el nodo elimina instancias previas para evitar duplicados.
+- En modo `Link Override` se crea una biblioteca sobreescrita real en vez de un `Append`.
 
 ### Transform
 Aplica transformaciones básicas.
