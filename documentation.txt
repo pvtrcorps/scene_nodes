@@ -64,13 +64,17 @@ Crea una luz en la escena.
 - **Energy**: potencia de la luz.
 - **Color**: color de la luz.
 
-### Global Options
-Define parámetros globales de la escena.
+### Scene Properties
+Define opciones generales de la escena.
 - **Resolution X/Y**: resolución de render.
-- **Samples**: número de muestras para el render.
 - **Camera Path**: ruta a una cámara existente en el archivo.
 
-### Render Outputs
+### Render Properties
+Ajustes del motor de render y el muestreo.
+- **Engine**: motor de render (Eevee, Cycles o Workbench).
+- **Samples**: número de muestras para el render.
+
+### Output Properties
 Establece datos básicos de salida.
 - **File Path**: carpeta o archivo de destino.
 - **Format**: formato de imagen (OpenEXR o PNG).
@@ -88,11 +92,11 @@ de lo contrario utilizará el valor interno editable en el propio nodo.
 
 Flujo de trabajo recomendado
 ---------------------------
-1. Empieza con un nodo **Global Options** para configurar la escena.
+1. Empieza con nodos **Scene Properties** y **Render Properties** para configurar la escena.
 2. Añade instancias o grupos según sea necesario.
 3. Inserta nodos **Transform** para posicionar los elementos.
 4. Utiliza **Light** para iluminar.
-5. Añade un nodo **Render Outputs** si necesitas configurar la salida.
+5. Añade un nodo **Output Properties** si necesitas configurar la salida.
 6. Cierra el árbol con **Scene Output** para crear la escena.
 7. Ejecuta **Sync to Scene** para aplicar los cambios.
 
@@ -100,5 +104,9 @@ Ten en cuenta que este complemento sigue siendo experimental, pero ahora la
 evaluación del árbol aplica los cambios directamente en la escena de Blender en
 lugar de limitarse a imprimir información en la consola. Sirve como base para
 futuros flujos de trabajo nodales de ensamblaje de escenas.
+
+Actualización
+-------------
+Los nodos **Global Options** y **Render Outputs** se han dividido en **Scene Properties**, **Render Properties** y **Output Properties**.
 
 ---
