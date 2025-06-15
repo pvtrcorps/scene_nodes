@@ -16,7 +16,7 @@ class SCENE_GRAPH_PT_node_properties(bpy.types.Panel):
         node = context.active_node
         cls = node.__class__
         if getattr(cls, '_prop_defs', []):
-            for attr, label, _socket in getattr(cls, '_prop_defs', []):
+            for attr, label, _socket, *_ in getattr(cls, '_prop_defs', []):
                 row = layout.row()
                 row.prop(node, attr, text=label)
                 expose = cls._expose_prop_map.get(attr)
