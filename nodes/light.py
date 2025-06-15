@@ -6,7 +6,6 @@ class LightNode(BaseNode):
     bl_label = "Light"
 
     def init(self, context):
-        super().init(context)
         self.add_property_sockets()
         self.outputs.new('SceneSocketType', "Scene")
 

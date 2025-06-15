@@ -15,9 +15,6 @@ node_categories = [
         NodeItem("LightNodeType"),
         NodeItem("GlobalOptionsNodeType"),
         NodeItem("OutputsStubNodeType"),
-        NodeItem("RenderSettingsNodeType"),
-        NodeItem("OutputPropertiesNodeType"),
-        NodeItem("ScenePropertiesNodeType"),
         NodeItem("SceneOutputNodeType"),
     ])
 ]
