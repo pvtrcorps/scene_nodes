@@ -26,6 +26,31 @@ class SCENE_NODES_PT_node_props(bpy.types.Panel):
                 layout.prop(node, prop_name, text=label)
 
 
+class SCENE_NODES_PT_socket_visibility(bpy.types.Panel):
+    bl_idname = "SCENE_NODES_PT_socket_visibility"
+    bl_label = "Socket Visibility"
+    bl_space_type = 'NODE_EDITOR'
+    bl_region_type = 'UI'
+    bl_category = 'Scene Nodes'
+
+    @classmethod
+    def poll(cls, context):
+        node = getattr(context, "active_node", None)
+        if node is None:
+            node = getattr(context, "node", None)
+        return node is not None and hasattr(node.__class__, "_prop_defs")
+
+    def draw(self, context):
+        node = getattr(context, "active_node", None)
+        if node is None:
+            node = getattr(context, "node", None)
+        layout = self.layout
+        for attr, label, _socket in getattr(node.__class__, '_prop_defs', []):
+            prop_name = f"use_{attr}"
+            if hasattr(node, prop_name):
+                layout.prop(node, prop_name, text=label)
+
+
 class SCENE_NODES_PT_node_props_properties(SCENE_NODES_PT_node_props):
     bl_idname = "SCENE_NODES_PT_node_props_properties"
     bl_space_type = 'PROPERTIES'
@@ -34,8 +59,10 @@ class SCENE_NODES_PT_node_props_properties(SCENE_NODES_PT_node_props):
 def register():
     bpy.utils.register_class(SCENE_NODES_PT_node_props)
     bpy.utils.register_class(SCENE_NODES_PT_node_props_properties)
+    bpy.utils.register_class(SCENE_NODES_PT_socket_visibility)
 
 
 def unregister():
+    bpy.utils.unregister_class(SCENE_NODES_PT_socket_visibility)
     bpy.utils.unregister_class(SCENE_NODES_PT_node_props_properties)
     bpy.utils.unregister_class(SCENE_NODES_PT_node_props)
