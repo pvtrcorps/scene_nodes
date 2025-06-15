@@ -90,8 +90,15 @@ def _evaluate_node(node):
 
 
 def evaluate_scene_tree(tree):
-    """Traverse *tree*, resolve dependencies and evaluate each node."""
-    order = _topological_sort(tree.nodes)
+    """Traverse *tree* starting from its active node and evaluate."""
+    if tree is None:
+        raise ValueError("Scene node tree is None")
+
+    root = getattr(tree.nodes, "active", None)
+    if root is not None:
+        order = _topological_sort([root])
+    else:
+        order = _topological_sort(tree.nodes)
     for node in order:
         if getattr(node, "scene_nodes_dirty", True):
             _evaluate_node(node)

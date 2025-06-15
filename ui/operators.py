@@ -8,5 +8,8 @@ class NODE_OT_sync_to_scene(bpy.types.Operator):
     def execute(self, context):
         from ..engine.evaluator import evaluate_scene_tree
         tree = context.scene.scene_node_tree
+        if tree is None:
+            self.report({'ERROR'}, "Scene has no Scene Node Tree")
+            return {'CANCELLED'}
         evaluate_scene_tree(tree)
         return {'FINISHED'}
