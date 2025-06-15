@@ -76,9 +76,47 @@ class StringSocket(NodeSocket):
     def draw_color(self, context, node):
         return (0.7, 0.7, 0.7, 1.0)
 
+PROPERTY_SOCKET_MAP = {
+    'float': (bpy.props.FloatProperty, 'FloatSocketType'),
+    'int': (bpy.props.IntProperty, 'IntSocketType'),
+    'bool': (bpy.props.BoolProperty, 'BoolSocketType'),
+    'vector': (bpy.props.FloatVectorProperty, 'VectorSocketType'),
+    'string': (bpy.props.StringProperty, 'StringSocketType'),
+    'enum': (bpy.props.EnumProperty, 'StringSocketType'),
+}
+
+
+def build_props_and_sockets(cls, descriptors):
+    """Create node properties and remember socket information.
+
+    Parameters
+    ----------
+    cls : type
+        Node class where the properties will be added.
+    descriptors : iterable
+        Each item must be ``(attr_name, type_key, kwargs)`` where ``type_key``
+        is a key of :data:`PROPERTY_SOCKET_MAP` and ``kwargs`` are passed
+        directly to ``bpy.props``.
+    """
+    cls._prop_defs = []
+    for attr, typ, kwargs in descriptors:
+        prop_fn, socket_id = PROPERTY_SOCKET_MAP[typ]
+        setattr(cls, attr, prop_fn(**kwargs))
+        label = kwargs.get('name', attr)
+        cls._prop_defs.append((attr, label, socket_id))
+    return cls
+
+
 class BaseNode(Node):
     bl_label = "Base Scene Node"
     bl_width_default = 200
 
     def init(self, context):
         pass  # Definir sockets en cada nodo concreto
+
+    def add_property_sockets(self):
+        """Instantiate sockets for the properties defined via
+        :func:`build_props_and_sockets`."""
+        for attr, label, socket in getattr(self.__class__, '_prop_defs', []):
+            sock = self.inputs.new(socket, label)
+            sock.value = getattr(self, attr)
