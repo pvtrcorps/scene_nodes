@@ -86,8 +86,9 @@ Flujo de trabajo recomendado
 5. Finaliza con **Render Outputs** para definir la salida.
 6. Ejecuta **Sync to Scene** para aplicar los cambios.
 
-Ten en cuenta que este complemento es experimental y la evaluación actualmente
-solo imprime información en la consola de Blender. Sirve como base para futuros
-flujos de trabajo nodales de ensamblaje de escenas.
+Ten en cuenta que este complemento sigue siendo experimental, pero ahora la
+evaluación del árbol aplica los cambios directamente en la escena de Blender en
+lugar de limitarse a imprimir información en la consola. Sirve como base para
+futuros flujos de trabajo nodales de ensamblaje de escenas.
 
 ---

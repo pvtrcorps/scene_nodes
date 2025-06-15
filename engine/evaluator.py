@@ -1,4 +1,5 @@
 import bpy
+from mathutils import Vector
 
 
 def _get_node_dependencies(node):
@@ -43,57 +44,134 @@ def _socket_value(node, name, default=None):
     return getattr(sock, "value", default)
 
 
-def _evaluate_scene_instance(node):
+def _collect_input_scenes(node):
+    """Gather evaluated scenes from linked inputs."""
+    scenes = []
+    for sock in node.inputs:
+        if sock.bl_idname == "SceneSocketType" and sock.is_linked:
+            for link in sock.links:
+                from_node = link.from_node
+                scenes.append(getattr(from_node, "scene_nodes_output", None))
+    return scenes
+
+
+def _evaluate_scene_instance(node, _inputs):
     filepath = _socket_value(node, "File Path", getattr(node, "file_path", ""))
     collection_path = _socket_value(node, "Collection Path", getattr(node, "collection_path", ""))
     as_override = _socket_value(node, "As Override", getattr(node, "as_override", False))
-    print(f"[scene_nodes] load instance {filepath}::{collection_path}, override={as_override}")
+    if not filepath or not collection_path:
+        node.scene_nodes_output = None
+        return None
+
+    with bpy.data.libraries.load(filepath, link=not as_override) as (data_from, data_to):
+        if collection_path in data_from.collections:
+            data_to.collections = [collection_path]
+
+    collection = data_to.collections[0] if data_to.collections else None
+    if collection is None:
+        node.scene_nodes_output = None
+        return None
+
+    bpy.context.scene.collection.children.link(collection)
+    if as_override:
+        collection = collection.override_create(bpy.context.scene.collection)
+
+    node.scene_nodes_output = collection
+    return collection
 
 
-def _evaluate_transform(node):
-    t = _socket_value(node, "Translate", getattr(node, "translate", (0.0, 0.0, 0.0)))
-    r = _socket_value(node, "Rotate", getattr(node, "rotate", (0.0, 0.0, 0.0)))
-    s = _socket_value(node, "Scale", getattr(node, "scale", (1.0, 1.0, 1.0)))
-    print(f"[scene_nodes] transform T={t} R={r} S={s}")
+def _evaluate_transform(node, inputs):
+    t = Vector(_socket_value(node, "Translate", getattr(node, "translate", (0.0, 0.0, 0.0))))
+    r = Vector(_socket_value(node, "Rotate", getattr(node, "rotate", (0.0, 0.0, 0.0))))
+    s = Vector(_socket_value(node, "Scale", getattr(node, "scale", (1.0, 1.0, 1.0))))
+
+    for coll in inputs:
+        if coll is None:
+            continue
+        for obj in coll.objects:
+            obj.location = Vector(obj.location) + t
+            obj.rotation_euler = Vector(obj.rotation_euler) + r
+            obj.scale = Vector(obj.scale) * s
+
+    node.scene_nodes_output = inputs[0] if inputs else None
+    return node.scene_nodes_output
 
 
-def _evaluate_group(_node):
-    print("[scene_nodes] group scenes")
+def _evaluate_group(node, inputs):
+    collection = bpy.data.collections.new(name=f"{node.name}_group")
+    bpy.context.scene.collection.children.link(collection)
+    for coll in inputs:
+        if coll is None:
+            continue
+        for obj in coll.objects:
+            if obj.name not in collection.objects:
+                collection.objects.link(obj)
+
+    node.scene_nodes_output = collection
+    return collection
 
 
-def _evaluate_light(node):
+def _evaluate_light(node, _inputs):
     ltype = _socket_value(node, "Type", getattr(node, "light_type", "POINT"))
     energy = _socket_value(node, "Energy", getattr(node, "energy", 1.0))
-    print(f"[scene_nodes] create light {ltype} energy={energy}")
+    color = _socket_value(node, "Color", getattr(node, "color", (1.0, 1.0, 1.0)))
+
+    light_data = bpy.data.lights.new(name=node.name, type=ltype)
+    light_data.energy = energy
+    light_data.color = color
+
+    light_obj = bpy.data.objects.new(node.name, light_data)
+    bpy.context.scene.collection.objects.link(light_obj)
+
+    node.scene_nodes_output = bpy.context.scene.collection
+    return node.scene_nodes_output
 
 
-def _evaluate_global_options(node):
+def _evaluate_global_options(node, _inputs):
     res_x = _socket_value(node, "Resolution X", getattr(node, "res_x", 1920))
     res_y = _socket_value(node, "Resolution Y", getattr(node, "res_y", 1080))
     samples = _socket_value(node, "Samples", getattr(node, "samples", 128))
-    print(f"[scene_nodes] global options {res_x}x{res_y} samples={samples}")
+    camera_path = _socket_value(node, "Camera Path", getattr(node, "camera_path", ""))
+
+    scene = bpy.context.scene
+    scene.render.resolution_x = res_x
+    scene.render.resolution_y = res_y
+    scene.cycles.samples = samples if hasattr(scene, "cycles") else samples
+
+    if camera_path in bpy.data.objects:
+        scene.camera = bpy.data.objects[camera_path]
+
+    node.scene_nodes_output = scene.collection
+    return node.scene_nodes_output
 
 
-def _evaluate_outputs_stub(node):
+def _evaluate_outputs_stub(node, _inputs):
     path = _socket_value(node, "File Path", getattr(node, "filepath", ""))
     fmt = _socket_value(node, "Format", getattr(node, "file_format", "OPEN_EXR"))
-    print(f"[scene_nodes] outputs {path} format={fmt}")
+
+    scene = bpy.context.scene
+    scene.render.filepath = path
+    scene.render.image_settings.file_format = fmt
+
+    node.scene_nodes_output = scene.collection
+    return node.scene_nodes_output
 
 
 def _evaluate_node(node):
+    inputs = _collect_input_scenes(node)
     ntype = node.bl_idname
     if ntype == "SceneInstanceNodeType":
-        _evaluate_scene_instance(node)
+        return _evaluate_scene_instance(node, inputs)
     elif ntype == "TransformNodeType":
-        _evaluate_transform(node)
+        return _evaluate_transform(node, inputs)
     elif ntype == "GroupNodeType":
-        _evaluate_group(node)
+        return _evaluate_group(node, inputs)
     elif ntype == "LightNodeType":
-        _evaluate_light(node)
+        return _evaluate_light(node, inputs)
     elif ntype == "GlobalOptionsNodeType":
-        _evaluate_global_options(node)
+        return _evaluate_global_options(node, inputs)
     elif ntype == "OutputsStubNodeType":
-        _evaluate_outputs_stub(node)
+        return _evaluate_outputs_stub(node, inputs)
     else:
         print(f"[scene_nodes] unknown node type {ntype}")
 
@@ -110,5 +188,5 @@ def evaluate_scene_tree(tree):
         order = _topological_sort(tree.nodes)
     for node in order:
         if getattr(node, "scene_nodes_dirty", True):
-            _evaluate_node(node)
+            node.scene_nodes_output = _evaluate_node(node)
             node.scene_nodes_dirty = False

@@ -36,6 +36,6 @@ out = tree.nodes.new("OutputsStubNodeType")
 # Link instance to output
 tree.links.new(inst.outputs[0], out.inputs[0])
 
-# Evaluate the tree (prints to the console)
+# Evaluate the tree (applies changes to the scene)
 evaluate_scene_tree(tree)
 ```
