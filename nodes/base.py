@@ -99,11 +99,19 @@ def build_props_and_sockets(cls, descriptors):
         directly to ``bpy.props``.
     """
     cls._prop_defs = []
-    for attr, typ, kwargs in descriptors:
+    for desc in descriptors:
+        if len(desc) == 3:
+            attr, typ, kwargs = desc
+            category = None
+        elif len(desc) == 4:
+            attr, typ, kwargs, category = desc
+        else:
+            raise ValueError("Invalid property descriptor")
+
         prop_fn, socket_id = PROPERTY_SOCKET_MAP[typ]
         setattr(cls, attr, prop_fn(**kwargs))
         label = kwargs.get('name', attr)
-        cls._prop_defs.append((attr, label, socket_id))
+        cls._prop_defs.append((attr, label, socket_id, category))
     return cls
 
 
@@ -117,7 +125,11 @@ class BaseNode(Node):
     def add_property_sockets(self):
         """Instantiate sockets for the properties defined via
         :func:`build_props_and_sockets`."""
-        for attr, label, socket in getattr(self.__class__, '_prop_defs', []):
+        for info in getattr(self.__class__, '_prop_defs', []):
+            if len(info) == 3:
+                attr, label, socket = info
+            else:
+                attr, label, socket, _category = info
             sock = self.inputs.new(socket, label)
             try:
                 sock.value = getattr(self, attr)
