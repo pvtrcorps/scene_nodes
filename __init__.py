@@ -34,6 +34,7 @@ from .nodes.outputs_stub import OutputsStubNode
 from .ui.node_categories import node_categories
 from .ui.node_editor import SCENE_GRAPH_MT_add
 from .ui.operators import NODE_OT_sync_to_scene
+from . import ui
 
 # Engine
 from .engine import evaluate_scene_tree
@@ -60,9 +61,11 @@ def register():
         bpy.utils.register_class(cls)
     bpy.types.Scene.scene_node_tree = bpy.props.PointerProperty(type=SceneNodeTree)
     register_node_categories(NODETREE_CATEGORY, node_categories)
+    ui.register()
 
 
 def unregister():
+    ui.unregister()
     unregister_node_categories(NODETREE_CATEGORY)
     del bpy.types.Scene.scene_node_tree
     for cls in reversed(classes):
