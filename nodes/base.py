@@ -106,17 +106,10 @@ def build_props_and_sockets(cls, descriptors):
     """
     cls._prop_defs = []
     cls._expose_prop_map = {}
-    categories = []
     for desc in descriptors:
-        if len(desc) == 3:
-            attr, typ, kwargs = desc
-            category = None
-        elif len(desc) == 4:
-            attr, typ, kwargs, category = desc
-            if category and category not in categories:
-                categories.append(category)
-        else:
+        if len(desc) < 3:
             raise ValueError("Invalid property descriptor")
+        attr, typ, kwargs = desc[:3]
 
         prop_fn, socket_id = PROPERTY_SOCKET_MAP[typ]
         setattr(cls, attr, prop_fn(**kwargs))
@@ -132,14 +125,7 @@ def build_props_and_sockets(cls, descriptors):
             ),
         )
         cls._expose_prop_map[attr] = expose_prop
-        cls._prop_defs.append((attr, label, socket_id, category))
-
-    cls._categories = categories
-    cls._category_prop_map = {}
-    for cat in categories:
-        prop_name = f"panel_show_{_sanitize(cat)}"
-        setattr(cls, prop_name, bpy.props.BoolProperty(name=cat, default=True))
-        cls._category_prop_map[cat] = prop_name
+        cls._prop_defs.append((attr, label, socket_id))
 
     return cls
 
@@ -155,10 +141,7 @@ class BaseNode(Node):
         """Instantiate sockets for the properties defined via
         :func:`build_props_and_sockets`."""
         for info in getattr(self.__class__, '_prop_defs', []):
-            if len(info) == 3:
-                attr, label, socket = info
-            else:
-                attr, label, socket, _category = info
+            attr, label, socket = info
             sock = self.inputs.new(socket, label)
             expose_prop = self.__class__._expose_prop_map.get(attr)
             if expose_prop:
@@ -171,7 +154,7 @@ class BaseNode(Node):
 
     def update_sockets(self, _context=None):
         cls = self.__class__
-        for attr, label, _socket, _cat in getattr(cls, '_prop_defs', []):
+        for attr, label, _socket in getattr(cls, '_prop_defs', []):
             expose_prop = cls._expose_prop_map.get(attr)
             if expose_prop:
                 sock = self.inputs.get(label)

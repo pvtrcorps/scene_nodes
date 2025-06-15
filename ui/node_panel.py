@@ -16,30 +16,12 @@ class SCENE_GRAPH_PT_node_properties(bpy.types.Panel):
         node = context.active_node
         cls = node.__class__
         if getattr(cls, '_prop_defs', []):
-            categories = getattr(cls, '_categories', [])
-            if categories:
-                for cat in categories:
-                    prop_name = cls._category_prop_map.get(cat)
-                    expanded = getattr(node, prop_name)
-                    box = layout.box()
-                    row = box.row()
-                    row.prop(node, prop_name, icon='TRIA_DOWN' if expanded else 'TRIA_RIGHT', emboss=False, icon_only=True)
-                    row.label(text=cat)
-                    if expanded:
-                        for attr, label, _socket, category in cls._prop_defs:
-                            if category == cat:
-                                row = box.row()
-                                row.prop(node, attr, text=label)
-                                expose = cls._expose_prop_map.get(attr)
-                                if expose:
-                                    row.prop(node, expose, text='Socket')
-            for attr, label, _socket, category in getattr(cls, '_prop_defs', []):
-                if category is None:
-                    row = layout.row()
-                    row.prop(node, attr, text=label)
-                    expose = cls._expose_prop_map.get(attr)
-                    if expose:
-                        row.prop(node, expose, text='Socket')
+            for attr, label, _socket in getattr(cls, '_prop_defs', []):
+                row = layout.row()
+                row.prop(node, attr, text=label)
+                expose = cls._expose_prop_map.get(attr)
+                if expose:
+                    row.prop(node, expose, text='Socket')
         else:
             if hasattr(node, 'data_type'):
                 layout.prop(node, 'data_type')
