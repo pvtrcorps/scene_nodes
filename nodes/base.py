@@ -102,8 +102,20 @@ def build_props_and_sockets(cls, descriptors):
     for attr, typ, kwargs in descriptors:
         prop_fn, socket_id = PROPERTY_SOCKET_MAP[typ]
         setattr(cls, attr, prop_fn(**kwargs))
-        label = kwargs.get('name', attr)
+        label = kwargs.get("name", attr)
         cls._prop_defs.append((attr, label, socket_id))
+
+        # Boolean property controlling the socket visibility
+        bool_name = f"use_{attr}"
+        setattr(
+            cls,
+            bool_name,
+            bpy.props.BoolProperty(
+                name=f"Use {label}",
+                default=True,
+                update=lambda self, ctx, a=attr: self.update_socket_visibility(a),
+            ),
+        )
     return cls
 
 
@@ -115,11 +127,50 @@ class BaseNode(Node):
         pass  # Definir sockets en cada nodo concreto
 
     def add_property_sockets(self):
-        """Instantiate sockets for the properties defined via
-        :func:`build_props_and_sockets`."""
-        for attr, label, socket in getattr(self.__class__, '_prop_defs', []):
-            sock = self.inputs.new(socket, label)
-            try:
-                sock.value = getattr(self, attr)
-            except Exception:
-                pass
+        """Instantiate sockets for all defined properties."""
+        for attr, _label, _socket in getattr(self.__class__, "_prop_defs", []):
+            self.add_property_socket(attr)
+
+    # ------------------------------------------------------------------
+    # Socket management helpers
+    # ------------------------------------------------------------------
+    def _find_prop_def(self, attr):
+        for a, label, socket in getattr(self.__class__, "_prop_defs", []):
+            if a == attr:
+                return label, socket
+        return None, None
+
+    def add_property_socket(self, attr):
+        """Add the socket corresponding to *attr* if it doesn't exist."""
+        label, socket = self._find_prop_def(attr)
+        if label is None:
+            return
+        if self.inputs.get(label) is not None:
+            return
+        sock = self.inputs.new(socket, label)
+        try:
+            sock.value = getattr(self, attr)
+        except Exception:
+            pass
+
+    def remove_property_socket(self, attr):
+        """Remove the socket corresponding to *attr* if present."""
+        label, _socket = self._find_prop_def(attr)
+        if label is None:
+            return
+        sock = self.inputs.get(label)
+        if sock is not None:
+            self.inputs.remove(sock)
+
+    def update_socket_visibility(self, attr):
+        """Show or hide the socket for *attr* based on its use flag."""
+        if getattr(self, f"use_{attr}", False):
+            self.add_property_socket(attr)
+        else:
+            self.remove_property_socket(attr)
+
+    def add_enabled_sockets(self):
+        """Instantiate sockets only for properties with their use flag enabled."""
+        for attr, _label, _socket in getattr(self.__class__, "_prop_defs", []):
+            if getattr(self, f"use_{attr}", False):
+                self.add_property_socket(attr)
