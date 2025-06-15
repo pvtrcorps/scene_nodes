@@ -115,10 +115,15 @@ def build_props_and_sockets(cls, descriptors):
 
         # Boolean property controlling the socket visibility
         bool_name = f"use_{attr}"
+        def _make_update(name):
+            def _update(self, ctx):
+                self.update_socket_visibility(name)
+            return _update
+
         bool_prop = bpy.props.BoolProperty(
             name=f"Use {label}",
             default=True,
-            update=lambda self, ctx, a=attr: self.update_socket_visibility(a),
+            update=_make_update(attr),
         )
         setattr(cls, bool_name, bool_prop)
         annotations[bool_name] = bool_prop
