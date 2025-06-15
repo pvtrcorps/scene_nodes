@@ -9,3 +9,6 @@ class GroupNode(BaseNode):
         self.inputs.new('SceneSocketType', "Scene 1")
         self.inputs.new('SceneSocketType', "Scene 2")
         self.outputs.new('SceneSocketType', "Scene")
+
+    def draw_buttons(self, _context, _layout):
+        pass

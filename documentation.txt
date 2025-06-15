@@ -70,6 +70,13 @@ Establece datos básicos de salida.
 - **File Path**: carpeta o archivo de destino.
 - **Format**: formato de imagen (OpenEXR o PNG).
 
+Conexión de propiedades
+-----------------------
+Los valores mostrados en los nodos también aparecen como sockets de entrada.
+Puedes conectar estos sockets entre distintos nodos para compartir el mismo
+valor. Si un socket está enlazado, el nodo tomará el valor de la conexión;
+de lo contrario utilizará el valor interno editable en el propio nodo.
+
 Flujo de trabajo recomendado
 ---------------------------
 1. Empieza con un nodo **Global Options** para configurar la escena.

@@ -1,5 +1,11 @@
 import bpy
-from .base import BaseNode, SceneSocket
+from .base import (
+    BaseNode,
+    SceneSocket,
+    FloatSocket,
+    StringSocket,
+    VectorSocket,
+)
 
 class LightNode(BaseNode):
     bl_idname = "LightNodeType"
@@ -13,4 +19,15 @@ class LightNode(BaseNode):
     color: bpy.props.FloatVectorProperty(name="Color", subtype='COLOR', default=(1,1,1))
 
     def init(self, context):
+        t = self.inputs.new('StringSocketType', "Type")
+        t.value = self.light_type
+        e = self.inputs.new('FloatSocketType', "Energy")
+        e.value = self.energy
+        c = self.inputs.new('VectorSocketType', "Color")
+        c.value = self.color
         self.outputs.new('SceneSocketType', "Scene")
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self.inputs["Type"], "value")
+        layout.prop(self.inputs["Energy"], "value")
+        layout.prop(self.inputs["Color"], "value")

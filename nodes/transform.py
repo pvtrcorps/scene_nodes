@@ -1,5 +1,9 @@
 import bpy
-from .base import BaseNode, SceneSocket
+from .base import (
+    BaseNode,
+    SceneSocket,
+    VectorSocket,
+)
 
 class TransformNode(BaseNode):
     bl_idname = "TransformNodeType"
@@ -11,4 +15,15 @@ class TransformNode(BaseNode):
 
     def init(self, context):
         self.inputs.new('SceneSocketType', "Scene")
+        t = self.inputs.new('VectorSocketType', "Translate")
+        t.value = self.translate
+        r = self.inputs.new('VectorSocketType', "Rotate")
+        r.value = self.rotate
+        s = self.inputs.new('VectorSocketType', "Scale")
+        s.value = self.scale
         self.outputs.new('SceneSocketType', "Scene")
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self.inputs["Translate"], "value")
+        layout.prop(self.inputs["Rotate"], "value")
+        layout.prop(self.inputs["Scale"], "value")
