@@ -205,6 +205,11 @@ def _evaluate_input(node, _inputs, _scene):
     return None
 
 
+def _evaluate_scene_output(node, inputs, scene):
+    node.scene_nodes_output = inputs[0] if inputs else None
+    return node.scene_nodes_output
+
+
 def _evaluate_node(node, scene):
     inputs = _collect_input_scenes(node)
     ntype = node.bl_idname
@@ -220,6 +225,8 @@ def _evaluate_node(node, scene):
         return _evaluate_global_options(node, inputs, scene)
     elif ntype == "OutputsStubNodeType":
         return _evaluate_outputs_stub(node, inputs, scene)
+    elif ntype == "SceneOutputNodeType":
+        return _evaluate_scene_output(node, inputs, scene)
     elif ntype == "InputNodeType":
         return _evaluate_input(node, inputs, scene)
     else:
@@ -227,18 +234,24 @@ def _evaluate_node(node, scene):
 
 
 def evaluate_scene_tree(tree):
-    """Traverse *tree* starting from its active node and evaluate."""
+    """Evaluate *tree* for every Scene Output node found."""
     if tree is None:
         raise ValueError("Scene node tree is None")
 
-    scene = _prepare_scene()
+    outputs = [n for n in tree.nodes if n.bl_idname == "SceneOutputNodeType"]
+    if not outputs:
+        raise RuntimeError("No Scene Output node in the tree")
 
-    root = getattr(tree.nodes, "active", None)
-    if root is not None:
-        order = _topological_sort([root])
-    else:
-        order = _topological_sort(tree.nodes)
-    for node in order:
-        if getattr(node, "scene_nodes_dirty", True):
+    names = []
+    for out in outputs:
+        name = _socket_value(out, "Name", getattr(out, "scene_name", "")) or "Scene"
+        if name in names:
+            raise RuntimeError(f"Duplicate scene name '{name}'")
+        names.append(name)
+
+    for out, name in zip(outputs, names):
+        scene = _prepare_scene(name)
+        order = _topological_sort([out])
+        for node in order:
             node.scene_nodes_output = _evaluate_node(node, scene)
-            node.scene_nodes_dirty = False
+
