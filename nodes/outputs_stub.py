@@ -24,5 +24,4 @@ class OutputsStubNode(BaseNode):
         self.outputs.new('SceneSocketType', "Scene")
 
     def draw_buttons(self, context, layout):
-        layout.prop(self.inputs["File Path"], "value")
-        layout.prop(self.inputs["Format"], "value")
+        pass  # Inputs already expose editable values next to their sockets

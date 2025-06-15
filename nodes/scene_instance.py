@@ -24,6 +24,4 @@ class SceneInstanceNode(BaseNode):
         self.outputs.new('SceneSocketType', "Scene")
 
     def draw_buttons(self, context, layout):
-        layout.prop(self.inputs["File Path"], "value")
-        layout.prop(self.inputs["Collection Path"], "value")
-        layout.prop(self.inputs["As Override"], "value")
+        pass  # Inputs already expose editable values next to their sockets
