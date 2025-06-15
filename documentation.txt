@@ -1,0 +1,86 @@
+Scene Nodes - Documentación para Usuarios
+===========================================
+
+Este complemento de Blender ofrece un sistema experimental basado en nodos para
+ensamblar escenas. Tras instalarlo tendrás disponible un nuevo tipo de "Scene
+Graph" dentro del editor de nodos.
+
+---
+
+Instalación
+------------
+1. Descarga o clona este repositorio.
+2. Empaqueta la carpeta `scene_nodes` en un archivo ZIP (o usa *Download ZIP* en
+   GitHub).
+3. En Blender ve a **Edit > Preferences > Add-ons** y pulsa **Install...**.
+4. Selecciona el ZIP e instala el complemento.
+5. Habilita **Scene Nodes** en la lista de add-ons.
+
+Al activarlo, podrás crear árboles de nodos de tipo **Scene Graph** desde el editor
+de nodos.
+
+Uso básico
+-----------
+1. Abre el Node Editor y cambia el tipo de arbol a **Scene Graph**.
+2. Añade nodos desde el menú **Add > Scene Node**.
+3. Conecta las salidas y entradas de tipo `Scene` entre nodos.
+4. Ejecuta el operador **Sync to Scene** (menú F3) para evaluar el árbol y
+   sincronizarlo con la escena de Blender.
+
+También es posible evaluar el arbol mediante Python con:
+
+```python
+from scene_nodes.engine import evaluate_scene_tree
+evaluate_scene_tree(mi_tree)
+```
+
+Nodos disponibles
+-----------------
+A continuación se describen los nodos incluidos y sus propiedades más relevantes.
+
+### Scene Instance
+Crea una instancia de otro archivo `.blend`.
+- **File Path**: ruta del archivo.
+- **Collection Path**: colección dentro del archivo a instanciar.
+- **As Override**: si se debe cargar como override.
+
+### Transform
+Aplica transformaciones básicas.
+- **Translate**: desplazamiento (XYZ).
+- **Rotate**: rotación (XYZ en radianes).
+- **Scale**: escala (XYZ).
+
+### Group
+Permite combinar varias entradas de escena y producir una sola salida.
+
+### Light
+Crea una luz en la escena.
+- **Type**: tipo de luz (Point, Sun, Spot, Area).
+- **Energy**: potencia de la luz.
+- **Color**: color de la luz.
+
+### Global Options
+Define parámetros globales de la escena.
+- **Resolution X/Y**: resolución de render.
+- **Samples**: número de muestras para el render.
+- **Camera Path**: ruta a una cámara existente en el archivo.
+
+### Render Outputs
+Establece datos básicos de salida.
+- **File Path**: carpeta o archivo de destino.
+- **Format**: formato de imagen (OpenEXR o PNG).
+
+Flujo de trabajo recomendado
+---------------------------
+1. Empieza con un nodo **Global Options** para configurar la escena.
+2. Añade instancias o grupos según sea necesario.
+3. Inserta nodos **Transform** para posicionar los elementos.
+4. Utiliza **Light** para iluminar.
+5. Finaliza con **Render Outputs** para definir la salida.
+6. Ejecuta **Sync to Scene** para aplicar los cambios.
+
+Ten en cuenta que este complemento es experimental y la evaluación actualmente
+solo imprime información en la consola de Blender. Sirve como base para futuros
+flujos de trabajo nodales de ensamblaje de escenas.
+
+---
