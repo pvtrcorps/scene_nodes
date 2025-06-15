@@ -49,17 +49,6 @@ class RenderSettingsNode(BaseNode):
         layout.prop(self, "engine", text="Engine")
 
 
-def _build_engine_props(cls, engine, rna_struct):
-    descs = descriptors_from_rna(rna_struct)
-    for identifier, typ, kwargs in descs:
-        prop_fn, socket_id = PROPERTY_SOCKET_MAP[typ]
-        attr = f"{engine.lower()}_{identifier}"
-        setattr(cls, attr, prop_fn(**kwargs))
-        label = kwargs.get('name', identifier)
-        cls._engine_prop_defs.append((attr, identifier, label, socket_id, engine))
-    return cls
-
-
 def _resolve_settings_struct(prop_name, fallback):
     cls = getattr(bpy.types, fallback, None)
     if cls is None:
