@@ -9,11 +9,16 @@ class SCENE_NODES_PT_node_props(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        node = context.active_node
+        node = getattr(context, "active_node", None)
+        if node is None:
+            # In the Properties editor the active node is stored in `context.node`
+            node = getattr(context, "node", None)
         return node is not None and hasattr(node.__class__, "_prop_defs")
 
     def draw(self, context):
-        node = context.active_node
+        node = getattr(context, "active_node", None)
+        if node is None:
+            node = getattr(context, "node", None)
         layout = self.layout
         for attr, label, _socket in getattr(node.__class__, '_prop_defs', []):
             prop_name = f"use_{attr}"
