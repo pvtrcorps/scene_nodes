@@ -22,8 +22,16 @@ class SCENE_NODES_PT_node_props(bpy.types.Panel):
         layout = self.layout
         for attr, label, _socket in getattr(node.__class__, '_prop_defs', []):
             prop_name = f"use_{attr}"
-            if hasattr(node, prop_name):
-                layout.prop(node, prop_name, text=label)
+            if not hasattr(node, prop_name):
+                continue
+
+            row = layout.row(align=True)
+            row.prop(node, prop_name, text=label, toggle=True)
+
+            if getattr(node, prop_name):
+                sock = node.inputs.get(label)
+                if sock is not None and not sock.is_linked:
+                    row.prop(sock, "value", text="")
 
 
 class SCENE_NODES_PT_socket_visibility(bpy.types.Panel):
@@ -47,8 +55,16 @@ class SCENE_NODES_PT_socket_visibility(bpy.types.Panel):
         layout = self.layout
         for attr, label, _socket in getattr(node.__class__, '_prop_defs', []):
             prop_name = f"use_{attr}"
-            if hasattr(node, prop_name):
-                layout.prop(node, prop_name, text=label)
+            if not hasattr(node, prop_name):
+                continue
+
+            row = layout.row(align=True)
+            row.prop(node, prop_name, text=label, toggle=True)
+
+            if getattr(node, prop_name):
+                sock = node.inputs.get(label)
+                if sock is not None and not sock.is_linked:
+                    row.prop(sock, "value", text="")
 
 
 class SCENE_NODES_PT_node_props_properties(SCENE_NODES_PT_node_props):
