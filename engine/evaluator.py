@@ -142,10 +142,16 @@ def _evaluate_transform(node, inputs, _scene=None):
     return node.scene_nodes_output
 
 
-def _evaluate_group(node, inputs, scene):
+def _evaluate_group(node, _inputs, scene):
     collection = bpy.data.collections.new(name=f"{node.name}_group")
     scene.collection.children.link(collection)
-    for coll in inputs:
+
+    for sock in node.inputs:
+        if sock.bl_idname != "SceneSocketType":
+            continue
+        coll = None
+        if sock.is_linked and sock.links:
+            coll = getattr(sock.links[0].from_node, "scene_nodes_output", None)
         if coll is None:
             continue
         for obj in coll.objects:
