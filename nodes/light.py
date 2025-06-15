@@ -6,7 +6,7 @@ class LightNode(BaseNode):
     bl_label = "Light"
 
     def init(self, context):
-        self.add_property_sockets()
+        self.add_enabled_sockets()
         self.outputs.new('SceneSocketType', "Scene")
 
     def draw_buttons(self, context, layout):

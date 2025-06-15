@@ -8,7 +8,7 @@ class SceneOutputNode(BaseNode):
 
     def init(self, context):
         self.inputs.new('SceneSocketType', "Scene")
-        self.add_property_sockets()
+        self.add_enabled_sockets()
 
     def draw_buttons(self, context, layout):
         pass

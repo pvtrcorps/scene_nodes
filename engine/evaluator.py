@@ -73,9 +73,21 @@ def _collect_input_scenes(node):
 
 
 def _evaluate_scene_instance(node, _inputs, scene):
-    filepath = _socket_value(node, "File Path", getattr(node, "file_path", ""))
-    collection_path = _socket_value(node, "Collection Path", getattr(node, "collection_path", ""))
-    load_mode = _socket_value(node, "Load Mode", getattr(node, "load_mode", "APPEND"))
+    filepath = (
+        _socket_value(node, "File Path", getattr(node, "file_path", ""))
+        if getattr(node, "use_file_path", False)
+        else ""
+    )
+    collection_path = (
+        _socket_value(node, "Collection Path", getattr(node, "collection_path", ""))
+        if getattr(node, "use_collection_path", False)
+        else ""
+    )
+    load_mode = (
+        _socket_value(node, "Load Mode", getattr(node, "load_mode", "APPEND"))
+        if getattr(node, "use_load_mode", False)
+        else getattr(node, "load_mode", "APPEND")
+    )
     if not filepath or not collection_path:
         node.scene_nodes_output = None
         return None
@@ -126,9 +138,27 @@ def _evaluate_scene_instance(node, _inputs, scene):
 
 
 def _evaluate_transform(node, inputs):
-    t = Vector(_socket_value(node, "Translate", getattr(node, "translate", (0.0, 0.0, 0.0))))
-    r = Vector(_socket_value(node, "Rotate", getattr(node, "rotate", (0.0, 0.0, 0.0))))
-    s = Vector(_socket_value(node, "Scale", getattr(node, "scale", (1.0, 1.0, 1.0))))
+    t = (
+        Vector(
+            _socket_value(node, "Translate", getattr(node, "translate", (0.0, 0.0, 0.0)))
+        )
+        if getattr(node, "use_translate", False)
+        else Vector((0.0, 0.0, 0.0))
+    )
+    r = (
+        Vector(
+            _socket_value(node, "Rotate", getattr(node, "rotate", (0.0, 0.0, 0.0)))
+        )
+        if getattr(node, "use_rotate", False)
+        else Vector((0.0, 0.0, 0.0))
+    )
+    s = (
+        Vector(
+            _socket_value(node, "Scale", getattr(node, "scale", (1.0, 1.0, 1.0)))
+        )
+        if getattr(node, "use_scale", False)
+        else Vector((1.0, 1.0, 1.0))
+    )
 
     for coll in inputs:
         if coll is None:
@@ -157,13 +187,27 @@ def _evaluate_group(node, inputs, scene):
 
 
 def _evaluate_light(node, _inputs, scene):
-    ltype = _socket_value(node, "Type", getattr(node, "light_type", "POINT"))
-    energy = _socket_value(node, "Energy", getattr(node, "energy", 1.0))
-    color = _socket_value(node, "Color", getattr(node, "color", (1.0, 1.0, 1.0)))
+    ltype = (
+        _socket_value(node, "Type", getattr(node, "light_type", "POINT"))
+        if getattr(node, "use_light_type", False)
+        else getattr(node, "light_type", "POINT")
+    )
+    energy = (
+        _socket_value(node, "Energy", getattr(node, "energy", 1.0))
+        if getattr(node, "use_energy", False)
+        else None
+    )
+    color = (
+        _socket_value(node, "Color", getattr(node, "color", (1.0, 1.0, 1.0)))
+        if getattr(node, "use_color", False)
+        else None
+    )
 
     light_data = bpy.data.lights.new(name=node.name, type=ltype)
-    light_data.energy = energy
-    light_data.color = color
+    if energy is not None:
+        light_data.energy = energy
+    if color is not None:
+        light_data.color = color
 
     light_obj = bpy.data.objects.new(node.name, light_data)
     scene.collection.objects.link(light_obj)
@@ -173,28 +217,34 @@ def _evaluate_light(node, _inputs, scene):
 
 
 def _evaluate_global_options(node, _inputs, scene):
-    res_x = _socket_value(node, "Resolution X", getattr(node, "res_x", 1920))
-    res_y = _socket_value(node, "Resolution Y", getattr(node, "res_y", 1080))
-    samples = _socket_value(node, "Samples", getattr(node, "samples", 128))
-    camera_path = _socket_value(node, "Camera Path", getattr(node, "camera_path", ""))
+    if getattr(node, "use_res_x", False):
+        res_x = _socket_value(node, "Resolution X", getattr(node, "res_x", 1920))
+        scene.render.resolution_x = res_x
 
-    scene.render.resolution_x = res_x
-    scene.render.resolution_y = res_y
-    scene.cycles.samples = samples if hasattr(scene, "cycles") else samples
+    if getattr(node, "use_res_y", False):
+        res_y = _socket_value(node, "Resolution Y", getattr(node, "res_y", 1080))
+        scene.render.resolution_y = res_y
 
-    if camera_path in bpy.data.objects:
-        scene.camera = bpy.data.objects[camera_path]
+    if getattr(node, "use_samples", False):
+        samples = _socket_value(node, "Samples", getattr(node, "samples", 128))
+        scene.cycles.samples = samples if hasattr(scene, "cycles") else samples
+
+    if getattr(node, "use_camera_path", False):
+        camera_path = _socket_value(node, "Camera Path", getattr(node, "camera_path", ""))
+        if camera_path in bpy.data.objects:
+            scene.camera = bpy.data.objects[camera_path]
 
     node.scene_nodes_output = scene.collection
     return node.scene_nodes_output
 
 
 def _evaluate_outputs_stub(node, _inputs, scene):
-    path = _socket_value(node, "File Path", getattr(node, "filepath", ""))
-    fmt = _socket_value(node, "Format", getattr(node, "file_format", "OPEN_EXR"))
-
-    scene.render.filepath = path
-    scene.render.image_settings.file_format = fmt
+    if getattr(node, "use_filepath", False):
+        path = _socket_value(node, "File Path", getattr(node, "filepath", ""))
+        scene.render.filepath = path
+    if getattr(node, "use_file_format", False):
+        fmt = _socket_value(node, "Format", getattr(node, "file_format", "OPEN_EXR"))
+        scene.render.image_settings.file_format = fmt
 
     node.scene_nodes_output = scene.collection
     return node.scene_nodes_output
@@ -244,7 +294,10 @@ def evaluate_scene_tree(tree):
 
     names = []
     for out in outputs:
-        name = _socket_value(out, "Name", getattr(out, "scene_name", "")) or "Scene"
+        if getattr(out, "use_scene_name", False):
+            name = _socket_value(out, "Name", getattr(out, "scene_name", "")) or "Scene"
+        else:
+            name = "Scene"
         if name in names:
             raise RuntimeError(f"Duplicate scene name '{name}'")
         names.append(name)
