@@ -1,5 +1,10 @@
 import bpy
-from .base import BaseNode, SceneSocket
+from .base import (
+    BaseNode,
+    SceneSocket,
+    IntSocket,
+    StringSocket,
+)
 
 class GlobalOptionsNode(BaseNode):
     bl_idname = "GlobalOptionsNodeType"
@@ -12,4 +17,18 @@ class GlobalOptionsNode(BaseNode):
 
     def init(self, context):
         self.inputs.new('SceneSocketType', "Scene")
+        rx = self.inputs.new('IntSocketType', "Resolution X")
+        rx.value = self.res_x
+        ry = self.inputs.new('IntSocketType', "Resolution Y")
+        ry.value = self.res_y
+        sp = self.inputs.new('IntSocketType', "Samples")
+        sp.value = self.samples
+        cp = self.inputs.new('StringSocketType', "Camera Path")
+        cp.value = self.camera_path
         self.outputs.new('SceneSocketType', "Scene")
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self.inputs["Resolution X"], "value")
+        layout.prop(self.inputs["Resolution Y"], "value")
+        layout.prop(self.inputs["Samples"], "value")
+        layout.prop(self.inputs["Camera Path"], "value")

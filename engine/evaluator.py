@@ -34,17 +34,26 @@ def _topological_sort(nodes):
     return order
 
 
+def _socket_value(node, name, default=None):
+    sock = node.inputs.get(name)
+    if sock is None:
+        return default
+    if sock.is_linked and sock.links:
+        return getattr(sock.links[0].from_socket, "value", default)
+    return getattr(sock, "value", default)
+
+
 def _evaluate_scene_instance(node):
-    filepath = getattr(node, "file_path", "")
-    collection_path = getattr(node, "collection_path", "")
-    as_override = getattr(node, "as_override", False)
+    filepath = _socket_value(node, "File Path", getattr(node, "file_path", ""))
+    collection_path = _socket_value(node, "Collection Path", getattr(node, "collection_path", ""))
+    as_override = _socket_value(node, "As Override", getattr(node, "as_override", False))
     print(f"[scene_nodes] load instance {filepath}::{collection_path}, override={as_override}")
 
 
 def _evaluate_transform(node):
-    t = getattr(node, "translate", (0.0, 0.0, 0.0))
-    r = getattr(node, "rotate", (0.0, 0.0, 0.0))
-    s = getattr(node, "scale", (1.0, 1.0, 1.0))
+    t = _socket_value(node, "Translate", getattr(node, "translate", (0.0, 0.0, 0.0)))
+    r = _socket_value(node, "Rotate", getattr(node, "rotate", (0.0, 0.0, 0.0)))
+    s = _socket_value(node, "Scale", getattr(node, "scale", (1.0, 1.0, 1.0)))
     print(f"[scene_nodes] transform T={t} R={r} S={s}")
 
 
@@ -53,21 +62,21 @@ def _evaluate_group(_node):
 
 
 def _evaluate_light(node):
-    ltype = getattr(node, "light_type", "POINT")
-    energy = getattr(node, "energy", 1.0)
+    ltype = _socket_value(node, "Type", getattr(node, "light_type", "POINT"))
+    energy = _socket_value(node, "Energy", getattr(node, "energy", 1.0))
     print(f"[scene_nodes] create light {ltype} energy={energy}")
 
 
 def _evaluate_global_options(node):
-    res_x = getattr(node, "res_x", 1920)
-    res_y = getattr(node, "res_y", 1080)
-    samples = getattr(node, "samples", 128)
+    res_x = _socket_value(node, "Resolution X", getattr(node, "res_x", 1920))
+    res_y = _socket_value(node, "Resolution Y", getattr(node, "res_y", 1080))
+    samples = _socket_value(node, "Samples", getattr(node, "samples", 128))
     print(f"[scene_nodes] global options {res_x}x{res_y} samples={samples}")
 
 
 def _evaluate_outputs_stub(node):
-    path = getattr(node, "filepath", "")
-    fmt = getattr(node, "file_format", "OPEN_EXR")
+    path = _socket_value(node, "File Path", getattr(node, "filepath", ""))
+    fmt = _socket_value(node, "Format", getattr(node, "file_format", "OPEN_EXR"))
     print(f"[scene_nodes] outputs {path} format={fmt}")
 
 

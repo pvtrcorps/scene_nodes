@@ -13,7 +13,14 @@ from nodeitems_utils import register_node_categories, unregister_node_categories
 
 # NodeTree y sockets
 from .node_tree import SceneNodeTree
-from .nodes.base import SceneSocket
+from .nodes.base import (
+    SceneSocket,
+    FloatSocket,
+    IntSocket,
+    BoolSocket,
+    VectorSocket,
+    StringSocket,
+)
 
 # Nodos individuales
 from .nodes.scene_instance import SceneInstanceNode
@@ -35,6 +42,11 @@ from .engine import evaluate_scene_tree
 classes = [
     SceneNodeTree,
     SceneSocket,
+    FloatSocket,
+    IntSocket,
+    BoolSocket,
+    VectorSocket,
+    StringSocket,
     SceneInstanceNode, TransformNode, GroupNode,
     LightNode, GlobalOptionsNode, OutputsStubNode,
     NODE_OT_sync_to_scene,
