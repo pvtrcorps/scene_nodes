@@ -99,7 +99,12 @@ def build_props_and_sockets(cls, descriptors):
         directly to ``bpy.props``.
     """
     cls._prop_defs = []
-    annotations = cls.__dict__.setdefault("__annotations__", {})
+    # Get or create the ``__annotations__`` dictionary. ``cls.__dict__`` is
+    # a read-only ``mappingproxy`` so ``setdefault`` cannot be used directly.
+    annotations = getattr(cls, "__annotations__", None)
+    if annotations is None:
+        annotations = {}
+        setattr(cls, "__annotations__", annotations)
     for attr, typ, kwargs in descriptors:
         prop_fn, socket_id = PROPERTY_SOCKET_MAP[typ]
         prop = prop_fn(**kwargs)
