@@ -21,6 +21,8 @@ class SCENE_NODES_PT_node_props(bpy.types.Panel):
             node = getattr(context, "node", None)
         layout = self.layout
         for attr, label, _socket in getattr(node.__class__, '_prop_defs', []):
+            if hasattr(node, "is_property_visible") and not node.is_property_visible(attr):
+                continue
             prop_name = f"use_{attr}"
             if not hasattr(node, prop_name):
                 continue
@@ -54,6 +56,8 @@ class SCENE_NODES_PT_socket_visibility(bpy.types.Panel):
             node = getattr(context, "node", None)
         layout = self.layout
         for attr, label, _socket in getattr(node.__class__, '_prop_defs', []):
+            if hasattr(node, "is_property_visible") and not node.is_property_visible(attr):
+                continue
             prop_name = f"use_{attr}"
             if not hasattr(node, prop_name):
                 continue

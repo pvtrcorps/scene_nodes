@@ -20,6 +20,9 @@ build_props_and_sockets(
     [
         ("res_x", "int", {"name": "Resolution X", "default": 1920}),
         ("res_y", "int", {"name": "Resolution Y", "default": 1080}),
+        ("frame_start", "int", {"name": "Frame Start", "default": 1}),
+        ("frame_end", "int", {"name": "Frame End", "default": 250}),
+        ("fps", "int", {"name": "FPS", "default": 24}),
         ("camera_path", "string", {"name": "Camera Path"}),
     ],
 )
