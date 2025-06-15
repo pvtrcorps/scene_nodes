@@ -125,7 +125,7 @@ def _evaluate_scene_instance(node, _inputs, scene):
     return collection
 
 
-def _evaluate_transform(node, inputs):
+def _evaluate_transform(node, inputs, _scene=None):
     t = Vector(_socket_value(node, "Translate", getattr(node, "translate", (0.0, 0.0, 0.0))))
     r = Vector(_socket_value(node, "Rotate", getattr(node, "rotate", (0.0, 0.0, 0.0))))
     s = Vector(_socket_value(node, "Scale", getattr(node, "scale", (1.0, 1.0, 1.0))))
@@ -210,27 +210,25 @@ def _evaluate_scene_output(node, inputs, scene):
     return node.scene_nodes_output
 
 
+_NODE_EVALUATORS = {
+    "SceneInstanceNodeType": _evaluate_scene_instance,
+    "TransformNodeType": _evaluate_transform,
+    "GroupNodeType": _evaluate_group,
+    "LightNodeType": _evaluate_light,
+    "GlobalOptionsNodeType": _evaluate_global_options,
+    "OutputsStubNodeType": _evaluate_outputs_stub,
+    "SceneOutputNodeType": _evaluate_scene_output,
+    "InputNodeType": _evaluate_input,
+}
+
+
 def _evaluate_node(node, scene):
     inputs = _collect_input_scenes(node)
-    ntype = node.bl_idname
-    if ntype == "SceneInstanceNodeType":
-        return _evaluate_scene_instance(node, inputs, scene)
-    elif ntype == "TransformNodeType":
-        return _evaluate_transform(node, inputs)
-    elif ntype == "GroupNodeType":
-        return _evaluate_group(node, inputs, scene)
-    elif ntype == "LightNodeType":
-        return _evaluate_light(node, inputs, scene)
-    elif ntype == "GlobalOptionsNodeType":
-        return _evaluate_global_options(node, inputs, scene)
-    elif ntype == "OutputsStubNodeType":
-        return _evaluate_outputs_stub(node, inputs, scene)
-    elif ntype == "SceneOutputNodeType":
-        return _evaluate_scene_output(node, inputs, scene)
-    elif ntype == "InputNodeType":
-        return _evaluate_input(node, inputs, scene)
-    else:
-        print(f"[scene_nodes] unknown node type {ntype}")
+    evaluator = _NODE_EVALUATORS.get(node.bl_idname)
+    if evaluator is None:
+        print(f"[scene_nodes] unknown node type {node.bl_idname}")
+        return None
+    return evaluator(node, inputs, scene)
 
 
 def evaluate_scene_tree(tree):
