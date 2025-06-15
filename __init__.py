@@ -29,6 +29,9 @@ from .nodes.group import GroupNode
 from .nodes.light import LightNode
 from .nodes.global_options import GlobalOptionsNode
 from .nodes.outputs_stub import OutputsStubNode
+from .nodes.cycles_render import CyclesRenderNode
+from .nodes.eevee_render import EeveeRenderNode
+from .nodes.output_properties import OutputPropertiesNode
 from .nodes.scene_output import SceneOutputNode
 from .nodes.input import InputNode
 
@@ -51,7 +54,9 @@ classes = [
     VectorSocket,
     StringSocket,
     SceneInstanceNode, TransformNode, GroupNode,
-    LightNode, GlobalOptionsNode, OutputsStubNode, SceneOutputNode, InputNode,
+    LightNode, GlobalOptionsNode, OutputsStubNode,
+    CyclesRenderNode, EeveeRenderNode, OutputPropertiesNode,
+    SceneOutputNode, InputNode,
     NODE_OT_sync_to_scene,
     SCENE_GRAPH_MT_add,
 ]

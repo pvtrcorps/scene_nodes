@@ -33,7 +33,7 @@ tree = bpy.data.node_groups.new("Example", "SceneNodeTreeType")
 
 # Add nodes
 inst = tree.nodes.new("SceneInstanceNodeType")
-out = tree.nodes.new("OutputsStubNodeType")
+out = tree.nodes.new("OutputPropertiesNodeType")
 
 # Link instance to output
 tree.links.new(inst.outputs[0], out.inputs[0])
