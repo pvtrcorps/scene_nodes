@@ -3,6 +3,29 @@ from .base import BaseNode, PROPERTY_SOCKET_MAP
 from .property_utils import descriptors_from_rna
 
 
+def _build_engine_props(node_cls, engine, rna_struct):
+    """Populate *node_cls* with properties from *rna_struct* for *engine*.
+
+    Each property from the RNA struct becomes a node property and a socket. The
+    generated attribute name is prefixed with the engine identifier to avoid
+    name clashes across engines. Information about the created properties is
+    stored in ``node_cls._engine_prop_defs`` so it can be used at evaluation
+    time.
+    """
+
+    descs = descriptors_from_rna(rna_struct)
+    for rna_attr, typ, kwargs in descs:
+        # Prefix the attribute name with the engine to keep them unique
+        attr_name = f"{engine.lower()}_{rna_attr}"
+
+        prop_fn, socket_id = PROPERTY_SOCKET_MAP[typ]
+        setattr(node_cls, attr_name, prop_fn(**kwargs))
+        label = kwargs.get("name", rna_attr)
+        node_cls._engine_prop_defs.append(
+            (attr_name, rna_attr, label, socket_id, engine)
+        )
+
+
 class RenderSettingsNode(BaseNode):
     bl_idname = "RenderSettingsNodeType"
     bl_label = "Render Settings"
