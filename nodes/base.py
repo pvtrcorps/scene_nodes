@@ -86,6 +86,12 @@ PROPERTY_SOCKET_MAP = {
 }
 
 
+def _sanitize(name):
+    """Return a valid identifier for ``name``."""
+    import re
+    return re.sub(r"[^0-9a-zA-Z_]", "_", name).lower()
+
+
 def build_props_and_sockets(cls, descriptors):
     """Create node properties and remember socket information.
 
@@ -99,12 +105,15 @@ def build_props_and_sockets(cls, descriptors):
         directly to ``bpy.props``.
     """
     cls._prop_defs = []
+    categories = []
     for desc in descriptors:
         if len(desc) == 3:
             attr, typ, kwargs = desc
             category = None
         elif len(desc) == 4:
             attr, typ, kwargs, category = desc
+            if category and category not in categories:
+                categories.append(category)
         else:
             raise ValueError("Invalid property descriptor")
 
@@ -112,6 +121,14 @@ def build_props_and_sockets(cls, descriptors):
         setattr(cls, attr, prop_fn(**kwargs))
         label = kwargs.get('name', attr)
         cls._prop_defs.append((attr, label, socket_id, category))
+
+    cls._categories = categories
+    cls._category_prop_map = {}
+    for cat in categories:
+        prop_name = f"panel_show_{_sanitize(cat)}"
+        setattr(cls, prop_name, bpy.props.BoolProperty(name=cat, default=True))
+        cls._category_prop_map[cat] = prop_name
+
     return cls
 
 

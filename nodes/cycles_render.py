@@ -12,12 +12,22 @@ class CyclesRenderNode(BaseNode):
         self.outputs.new('SceneSocketType', "Scene")
 
     def draw_buttons(self, context, layout):
-        current_cat = None
-        for attr, label, _socket, category in self.__class__._prop_defs:
-            if category and category != current_cat:
-                layout.label(text=category)
-                current_cat = category
-            layout.prop(self, attr, text=label)
+        cls = self.__class__
+        for cat in getattr(cls, "_categories", []):
+            prop_name = cls._category_prop_map.get(cat)
+            expanded = getattr(self, prop_name)
+            panel = layout.box()
+            row = panel.row()
+            row.prop(self, prop_name, icon="TRIA_DOWN" if expanded else "TRIA_RIGHT", emboss=False, icon_only=True)
+            row.label(text=cat)
+            if expanded:
+                for attr, label, _socket, category in cls._prop_defs:
+                    if category == cat:
+                        panel.prop(self, attr, text=label)
+
+        for attr, label, _socket, category in cls._prop_defs:
+            if category is None:
+                layout.prop(self, attr, text=label)
 
 
 build_props_and_sockets(
