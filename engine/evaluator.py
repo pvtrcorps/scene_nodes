@@ -75,11 +75,12 @@ def _collect_input_scenes(node):
 def _apply_node_properties(node, target):
     """Copy dynamic properties from *node* to *target*."""
     for attr, label, _ in getattr(node.__class__, '_prop_defs', []):
-        val = _socket_value(node, label, getattr(node, attr, None))
-        try:
-            setattr(target, attr, val)
-        except Exception:
-            pass
+        if getattr(node, f"use_{attr}", False):
+            val = _socket_value(node, label, getattr(node, attr, None))
+            try:
+                setattr(target, attr, val)
+            except Exception:
+                pass
 
 
 def _evaluate_scene_instance(node, _inputs, scene):
