@@ -90,6 +90,11 @@ Puedes conectar estos sockets entre distintos nodos para compartir el mismo
 valor. Si un socket está enlazado, el nodo tomará el valor de la conexión;
 de lo contrario utilizará el valor interno editable en el propio nodo.
 
+Para controlar qué sockets se muestran, selecciona un nodo y abre la barra
+lateral del Node Editor con **N**. En la pestaña **Node** encontrarás el panel
+**Node Properties** con casillas "Use ..." que activan o desactivan los
+sockets correspondientes.
+
 Flujo de trabajo recomendado
 ---------------------------
 1. Empieza con nodos **Scene Properties** y **Render Properties** para configurar la escena.

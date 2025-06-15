@@ -9,13 +9,8 @@ class SCENE_NODES_PT_node_props(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        space = context.space_data
-        tree_type = getattr(space, "tree_type", None)
-        return (
-            space is not None
-            and tree_type == 'SceneNodeTreeType'
-            and context.active_node is not None
-        )
+        node = context.active_node
+        return node is not None and hasattr(node.__class__, "_prop_defs")
 
     def draw(self, context):
         node = context.active_node
