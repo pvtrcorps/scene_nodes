@@ -7,7 +7,6 @@ class SceneOutputNode(BaseNode):
     bl_label = "Scene Output"
 
     def init(self, context):
-        super().init(context)
         self.inputs.new('SceneSocketType', "Scene")
         self.add_property_sockets()
 

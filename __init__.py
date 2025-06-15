@@ -31,9 +31,6 @@ from .nodes.global_options import GlobalOptionsNode
 from .nodes.outputs_stub import OutputsStubNode
 from .nodes.scene_output import SceneOutputNode
 from .nodes.input import InputNode
-from .nodes.render_properties import RenderSettingsNode
-from .nodes.output_properties import OutputPropertiesNode
-from .nodes.scene_properties import ScenePropertiesNode
 
 # UI
 from .ui.node_categories import node_categories
@@ -55,7 +52,6 @@ classes = [
     StringSocket,
     SceneInstanceNode, TransformNode, GroupNode,
     LightNode, GlobalOptionsNode, OutputsStubNode, SceneOutputNode, InputNode,
-    RenderSettingsNode, OutputPropertiesNode, ScenePropertiesNode,
     NODE_OT_sync_to_scene,
     SCENE_GRAPH_MT_add,
 ]
@@ -64,11 +60,7 @@ NODETREE_CATEGORY = 'SCENE_NODES'
 
 def register():
     for cls in classes:
-        try:
-            bpy.utils.register_class(cls)
-        except ValueError:
-            bpy.utils.unregister_class(cls)
-            bpy.utils.register_class(cls)
+        bpy.utils.register_class(cls)
     register_node_categories(NODETREE_CATEGORY, node_categories)
     ui.register()
 

@@ -99,27 +99,11 @@ def build_props_and_sockets(cls, descriptors):
         directly to ``bpy.props``.
     """
     cls._prop_defs = []
-    if not hasattr(cls, "__annotations__"):
-        cls.__annotations__ = {}
     for attr, typ, kwargs in descriptors:
         prop_fn, socket_id = PROPERTY_SOCKET_MAP[typ]
-        prop = prop_fn(**kwargs)
-        setattr(cls, attr, prop)
-        cls.__annotations__[attr] = prop
+        setattr(cls, attr, prop_fn(**kwargs))
         label = kwargs.get('name', attr)
         cls._prop_defs.append((attr, label, socket_id))
-        def _make_update(attr, sid, label):
-            def _update(self, ctx):
-                self.toggle_property_socket(attr, sid, label)
-            return _update
-
-        bool_prop = bpy.props.BoolProperty(
-            name=f"Use {label}",
-            default=True,
-            update=_make_update(attr, socket_id, label),
-        )
-        setattr(cls, f"use_{attr}", bool_prop)
-        cls.__annotations__[f"use_{attr}"] = bool_prop
     return cls
 
 
@@ -128,31 +112,14 @@ class BaseNode(Node):
     bl_width_default = 200
 
     def init(self, context):
-        self._property_sockets = {}
+        pass  # Definir sockets en cada nodo concreto
 
     def add_property_sockets(self):
         """Instantiate sockets for the properties defined via
         :func:`build_props_and_sockets`."""
         for attr, label, socket in getattr(self.__class__, '_prop_defs', []):
-            if getattr(self, f"use_{attr}", True):
-                sock = self.inputs.new(socket, label)
-                self._property_sockets[attr] = sock
-                try:
-                    sock.value = getattr(self, attr)
-                except Exception:
-                    pass
-
-    def toggle_property_socket(self, attr, sid, label):
-        """Add or remove a socket based on ``use_<attr>``."""
-        use = getattr(self, f"use_{attr}")
-        sock = self._property_sockets.get(attr)
-        if use and sock is None:
-            sock = self.inputs.new(sid, label)
-            self._property_sockets[attr] = sock
+            sock = self.inputs.new(socket, label)
             try:
                 sock.value = getattr(self, attr)
             except Exception:
                 pass
-        elif not use and sock is not None:
-            self.inputs.remove(sock)
-            del self._property_sockets[attr]

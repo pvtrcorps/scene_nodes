@@ -72,17 +72,6 @@ def _collect_input_scenes(node):
     return scenes
 
 
-def _apply_node_properties(node, target):
-    """Copy dynamic properties from *node* to *target*."""
-    for attr, label, _ in getattr(node.__class__, '_prop_defs', []):
-        if getattr(node, f"use_{attr}", False):
-            val = _socket_value(node, label, getattr(node, attr, None))
-            try:
-                setattr(target, attr, val)
-            except Exception:
-                pass
-
-
 def _evaluate_scene_instance(node, _inputs, scene):
     filepath = _socket_value(node, "File Path", getattr(node, "file_path", ""))
     collection_path = _socket_value(node, "Collection Path", getattr(node, "collection_path", ""))
@@ -136,7 +125,7 @@ def _evaluate_scene_instance(node, _inputs, scene):
     return collection
 
 
-def _evaluate_transform(node, inputs, _scene=None):
+def _evaluate_transform(node, inputs):
     t = Vector(_socket_value(node, "Translate", getattr(node, "translate", (0.0, 0.0, 0.0))))
     r = Vector(_socket_value(node, "Rotate", getattr(node, "rotate", (0.0, 0.0, 0.0))))
     s = Vector(_socket_value(node, "Scale", getattr(node, "scale", (1.0, 1.0, 1.0))))
@@ -153,16 +142,10 @@ def _evaluate_transform(node, inputs, _scene=None):
     return node.scene_nodes_output
 
 
-def _evaluate_group(node, _inputs, scene):
+def _evaluate_group(node, inputs, scene):
     collection = bpy.data.collections.new(name=f"{node.name}_group")
     scene.collection.children.link(collection)
-
-    for sock in node.inputs:
-        if sock.bl_idname != "SceneSocketType":
-            continue
-        coll = None
-        if sock.is_linked and sock.links:
-            coll = getattr(sock.links[0].from_node, "scene_nodes_output", None)
+    for coll in inputs:
         if coll is None:
             continue
         for obj in coll.objects:
@@ -217,49 +200,6 @@ def _evaluate_outputs_stub(node, _inputs, scene):
     return node.scene_nodes_output
 
 
-def _evaluate_property_node(node, _inputs, scene):
-    target = scene
-    for attr in getattr(node.__class__, 'property_group_path', []):
-        target = getattr(target, attr, None)
-        if target is None:
-            node.scene_nodes_output = scene.collection
-            return node.scene_nodes_output
-    _apply_node_properties(node, target)
-    node.scene_nodes_output = scene.collection
-    return node.scene_nodes_output
-
-
-def _socket_value_direct(sock, default=None):
-    if sock is None:
-        return default
-    if sock.is_linked and sock.links:
-        return getattr(sock.links[0].from_socket, "value", default)
-    return getattr(sock, "value", default)
-
-
-def _evaluate_render_settings(node, _inputs, scene):
-    scene.render.engine = node.engine
-    path = node.engine_path_map.get(node.engine, [])
-    target = scene
-    for attr in path:
-        target = getattr(target, attr, None)
-        if target is None:
-            node.scene_nodes_output = scene.collection
-            return node.scene_nodes_output
-
-    for pref_attr, rna_attr, _label, _sid, eng in node.__class__._engine_prop_defs:
-        if eng != node.engine:
-            continue
-        sock = node._property_sockets.get(pref_attr)
-        val = _socket_value_direct(sock, getattr(node, pref_attr, None))
-        try:
-            setattr(target, rna_attr, val)
-        except Exception:
-            pass
-
-    node.scene_nodes_output = scene.collection
-    return node.scene_nodes_output
-
 def _evaluate_input(node, _inputs, _scene):
     node.scene_nodes_output = None
     return None
@@ -270,28 +210,27 @@ def _evaluate_scene_output(node, inputs, scene):
     return node.scene_nodes_output
 
 
-_NODE_EVALUATORS = {
-    "SceneInstanceNodeType": _evaluate_scene_instance,
-    "TransformNodeType": _evaluate_transform,
-    "GroupNodeType": _evaluate_group,
-    "LightNodeType": _evaluate_light,
-    "GlobalOptionsNodeType": _evaluate_global_options,
-    "OutputsStubNodeType": _evaluate_outputs_stub,
-    "RenderSettingsNodeType": _evaluate_render_settings,
-    "OutputPropertiesNodeType": _evaluate_property_node,
-    "ScenePropertiesNodeType": _evaluate_property_node,
-    "SceneOutputNodeType": _evaluate_scene_output,
-    "InputNodeType": _evaluate_input,
-}
-
-
 def _evaluate_node(node, scene):
     inputs = _collect_input_scenes(node)
-    evaluator = _NODE_EVALUATORS.get(node.bl_idname)
-    if evaluator is None:
-        print(f"[scene_nodes] unknown node type {node.bl_idname}")
-        return None
-    return evaluator(node, inputs, scene)
+    ntype = node.bl_idname
+    if ntype == "SceneInstanceNodeType":
+        return _evaluate_scene_instance(node, inputs, scene)
+    elif ntype == "TransformNodeType":
+        return _evaluate_transform(node, inputs)
+    elif ntype == "GroupNodeType":
+        return _evaluate_group(node, inputs, scene)
+    elif ntype == "LightNodeType":
+        return _evaluate_light(node, inputs, scene)
+    elif ntype == "GlobalOptionsNodeType":
+        return _evaluate_global_options(node, inputs, scene)
+    elif ntype == "OutputsStubNodeType":
+        return _evaluate_outputs_stub(node, inputs, scene)
+    elif ntype == "SceneOutputNodeType":
+        return _evaluate_scene_output(node, inputs, scene)
+    elif ntype == "InputNodeType":
+        return _evaluate_input(node, inputs, scene)
+    else:
+        print(f"[scene_nodes] unknown node type {ntype}")
 
 
 def evaluate_scene_tree(tree):

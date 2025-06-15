@@ -14,9 +14,6 @@ class SCENE_GRAPH_MT_add(Menu):
         layout.operator("node.add_node", text="Light").type = "LightNodeType"
         layout.operator("node.add_node", text="Global Options").type = "GlobalOptionsNodeType"
         layout.operator("node.add_node", text="Render Outputs").type = "OutputsStubNodeType"
-        layout.operator("node.add_node", text="Render Settings").type = "RenderSettingsNodeType"
-        layout.operator("node.add_node", text="Output Properties").type = "OutputPropertiesNodeType"
-        layout.operator("node.add_node", text="Scene Properties").type = "ScenePropertiesNodeType"
         layout.operator("node.add_node", text="Scene Output").type = "SceneOutputNodeType"
 
 def menu_draw(self, context):
