@@ -110,6 +110,7 @@ def build_props_and_sockets(cls, descriptors):
         if len(desc) < 3:
             raise ValueError("Invalid property descriptor")
         attr, typ, kwargs = desc[:3]
+        category = desc[3] if len(desc) > 3 else None
 
         prop_fn, socket_id = PROPERTY_SOCKET_MAP[typ]
         setattr(cls, attr, prop_fn(**kwargs))
@@ -125,7 +126,7 @@ def build_props_and_sockets(cls, descriptors):
             ),
         )
         cls._expose_prop_map[attr] = expose_prop
-        cls._prop_defs.append((attr, label, socket_id))
+        cls._prop_defs.append((attr, label, socket_id, category))
 
     return cls
 
@@ -141,7 +142,7 @@ class BaseNode(Node):
         """Instantiate sockets for the properties defined via
         :func:`build_props_and_sockets`."""
         for info in getattr(self.__class__, '_prop_defs', []):
-            attr, label, socket = info
+            attr, label, socket, *_ = info
             sock = self.inputs.new(socket, label)
             expose_prop = self.__class__._expose_prop_map.get(attr)
             if expose_prop:
@@ -154,7 +155,7 @@ class BaseNode(Node):
 
     def update_sockets(self, _context=None):
         cls = self.__class__
-        for attr, label, _socket in getattr(cls, '_prop_defs', []):
+        for attr, label, _socket, *_ in getattr(cls, '_prop_defs', []):
             expose_prop = cls._expose_prop_map.get(attr)
             if expose_prop:
                 sock = self.inputs.get(label)
