@@ -67,17 +67,22 @@ Crea una luz en la escena.
 ### Scene Properties
 Define opciones generales de la escena.
 - **Resolution X/Y**: resolución de render.
+- **Frame Start/End**: rango de cuadros para la animación.
+- **FPS**: fotogramas por segundo.
 - **Camera Path**: ruta a una cámara existente en el archivo.
 
 ### Render Properties
 Ajustes del motor de render y el muestreo.
 - **Engine**: motor de render (Eevee, Cycles o Workbench).
 - **Samples**: número de muestras para el render.
+- **Motion Blur** (Eevee): habilitar desenfoque de movimiento.
+- **Max Bounces** (Cycles): número máximo de rebotes de la luz.
 
 ### Output Properties
 Establece datos básicos de salida.
 - **File Path**: carpeta o archivo de destino.
 - **Format**: formato de imagen (OpenEXR o PNG).
+- **Color**: modo de color de la imagen.
 
 ### Scene Output
 Define el nombre de la escena resultante. Debe situarse al final del 

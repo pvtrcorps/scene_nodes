@@ -206,3 +206,7 @@ class BaseNode(Node):
         for attr, _label, _socket in getattr(self.__class__, "_prop_defs", []):
             if getattr(self, f"use_{attr}", False):
                 self.add_property_socket(attr)
+
+    def is_property_visible(self, _attr):
+        """Override in subclasses to hide properties from the panels."""
+        return True

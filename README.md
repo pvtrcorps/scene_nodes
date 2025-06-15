@@ -12,6 +12,11 @@ Experimental node-based system for assembling Blender scenes.
 
 After enabling, you'll have a new **Scene Graph** tree type in the Node Editor.
 
+## New in this version
+
+- Render Properties node now adjusts its parameters depending on the selected render engine.
+- Scene and Output nodes expose additional settings such as frame range, FPS and color mode.
+
 ## Usage
 
 1. Open the Node Editor and change the tree type to **Scene Graph**.

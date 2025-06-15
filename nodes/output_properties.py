@@ -30,5 +30,18 @@ build_props_and_sockets(
                 "name": "Format",
             },
         ),
+        (
+            "color_mode",
+            "enum",
+            {
+                "name": "Color",
+                "items": [
+                    ("BW", "BW", ""),
+                    ("RGB", "RGB", ""),
+                    ("RGBA", "RGBA", ""),
+                ],
+                "default": "RGB",
+            },
+        ),
     ],
 )
