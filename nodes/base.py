@@ -108,13 +108,15 @@ def build_props_and_sockets(cls, descriptors):
         cls.__annotations__[attr] = prop
         label = kwargs.get('name', attr)
         cls._prop_defs.append((attr, label, socket_id))
-        def _update(self, ctx, attr=attr, sid=socket_id, label=label):
-            self.toggle_property_socket(attr, sid, label)
+        def _make_update(attr, sid, label):
+            def _update(self, ctx):
+                self.toggle_property_socket(attr, sid, label)
+            return _update
 
         bool_prop = bpy.props.BoolProperty(
             name=f"Use {label}",
             default=True,
-            update=_update,
+            update=_make_update(attr, socket_id, label),
         )
         setattr(cls, f"use_{attr}", bool_prop)
         cls.__annotations__[f"use_{attr}"] = bool_prop
