@@ -50,6 +50,10 @@ class RenderSettingsNode(BaseNode):
     _engine_prop_defs = []  # (attr_pref, rna_attr, label, socket_id, engine)
 
     def update_engine(self, context):
+        # During node creation the EnumProperty update callback can run before
+        # :func:`init` has had a chance to create ``_property_sockets``.
+        if not hasattr(self, "_property_sockets"):
+            return
         for attr, _rna, label, _sid, eng in self.__class__._engine_prop_defs:
             sock = self._property_sockets.get(attr)
             if sock:
