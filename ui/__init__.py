@@ -6,3 +6,13 @@ __all__ = [
     "SCENE_GRAPH_MT_add",
     "NODE_OT_sync_to_scene",
 ]
+from . import node_editor
+
+
+def register():
+    node_editor.register()
+
+
+def unregister():
+    node_editor.unregister()
+
