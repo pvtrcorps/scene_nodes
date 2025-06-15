@@ -26,6 +26,9 @@ Uso básico
 3. Conecta las salidas y entradas de tipo `Scene` entre nodos.
 4. Ejecuta el operador **Sync to Scene** (menú F3) para evaluar el árbol y
    sincronizarlo con la escena de Blender.
+   El operador utiliza el árbol de Scene Graph activo en el Node Editor (o el
+   primero que encuentre en el archivo), por lo que las escenas no necesitan
+   tener un árbol asignado.
 
 También es posible evaluar el arbol mediante Python con:
 
