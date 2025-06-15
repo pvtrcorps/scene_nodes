@@ -15,6 +15,9 @@ node_categories = [
         NodeItem("LightNodeType"),
         NodeItem("GlobalOptionsNodeType"),
         NodeItem("OutputsStubNodeType"),
+        NodeItem("CyclesRenderNodeType"),
+        NodeItem("EeveeRenderNodeType"),
+        NodeItem("OutputPropertiesNodeType"),
         NodeItem("SceneOutputNodeType"),
     ])
 ]

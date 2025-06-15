@@ -200,6 +200,45 @@ def _evaluate_outputs_stub(node, _inputs, scene):
     return node.scene_nodes_output
 
 
+def _evaluate_cycles_render(node, _inputs, scene):
+    samples = _socket_value(node, "Samples", getattr(node, "samples", 128))
+    use_denoise = _socket_value(node, "Use Denoise", getattr(node, "use_denoise", False))
+
+    if hasattr(scene, "cycles"):
+        scene.cycles.samples = samples
+        scene.cycles.use_denoising = use_denoise
+
+    node.scene_nodes_output = scene.collection
+    return node.scene_nodes_output
+
+
+def _evaluate_eevee_render(node, _inputs, scene):
+    samples = _socket_value(node, "Samples", getattr(node, "samples", 64))
+    use_bloom = _socket_value(node, "Bloom", getattr(node, "use_bloom", False))
+
+    if hasattr(scene, "eevee"):
+        scene.eevee.taa_render_samples = samples
+        scene.eevee.use_bloom = use_bloom
+
+    node.scene_nodes_output = scene.collection
+    return node.scene_nodes_output
+
+
+def _evaluate_output_properties(node, _inputs, scene):
+    path = _socket_value(node, "File Path", getattr(node, "filepath", ""))
+    fmt = _socket_value(node, "Format", getattr(node, "file_format", "OPEN_EXR"))
+    res_x = _socket_value(node, "Resolution X", getattr(node, "res_x", 1920))
+    res_y = _socket_value(node, "Resolution Y", getattr(node, "res_y", 1080))
+
+    scene.render.filepath = path
+    scene.render.image_settings.file_format = fmt
+    scene.render.resolution_x = res_x
+    scene.render.resolution_y = res_y
+
+    node.scene_nodes_output = scene.collection
+    return node.scene_nodes_output
+
+
 def _evaluate_input(node, _inputs, _scene):
     node.scene_nodes_output = None
     return None
@@ -225,6 +264,12 @@ def _evaluate_node(node, scene):
         return _evaluate_global_options(node, inputs, scene)
     elif ntype == "OutputsStubNodeType":
         return _evaluate_outputs_stub(node, inputs, scene)
+    elif ntype == "CyclesRenderNodeType":
+        return _evaluate_cycles_render(node, inputs, scene)
+    elif ntype == "EeveeRenderNodeType":
+        return _evaluate_eevee_render(node, inputs, scene)
+    elif ntype == "OutputPropertiesNodeType":
+        return _evaluate_output_properties(node, inputs, scene)
     elif ntype == "SceneOutputNodeType":
         return _evaluate_scene_output(node, inputs, scene)
     elif ntype == "InputNodeType":

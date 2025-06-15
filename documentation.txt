@@ -70,10 +70,26 @@ Define parámetros globales de la escena.
 - **Samples**: número de muestras para el render.
 - **Camera Path**: ruta a una cámara existente en el archivo.
 
+### Cycles Render Properties
+Ajustes específicos del motor Cycles.
+- **Samples**: número de muestras.
+- **Use Denoise**: aplica denoising.
+
+### EEVEE Render Properties
+Ajustes específicos para EEVEE.
+- **Samples**: número de muestras.
+- **Bloom**: activa el efecto de bloom.
+
 ### Render Outputs
 Establece datos básicos de salida.
 - **File Path**: carpeta o archivo de destino.
 - **Format**: formato de imagen (OpenEXR o PNG).
+
+### Output Properties
+Define la configuración final de salida.
+- **File Path**: carpeta o archivo de destino.
+- **Format**: formato de imagen.
+- **Resolution X/Y**: resolución del render.
 
 ### Scene Output
 Define el nombre de la escena resultante. Debe situarse al final del 
@@ -92,9 +108,10 @@ Flujo de trabajo recomendado
 2. Añade instancias o grupos según sea necesario.
 3. Inserta nodos **Transform** para posicionar los elementos.
 4. Utiliza **Light** para iluminar.
-5. Añade un nodo **Render Outputs** si necesitas configurar la salida.
-6. Cierra el árbol con **Scene Output** para crear la escena.
-7. Ejecuta **Sync to Scene** para aplicar los cambios.
+5. Configura las propiedades de render con los nodos **Cycles Render** o **EEVEE Render**.
+6. Añade un nodo **Output Properties** para definir la salida.
+7. Cierra el árbol con **Scene Output** para crear la escena.
+8. Ejecuta **Sync to Scene** para aplicar los cambios.
 
 Ten en cuenta que este complemento sigue siendo experimental, pero ahora la
 evaluación del árbol aplica los cambios directamente en la escena de Blender en
