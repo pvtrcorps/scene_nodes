@@ -29,6 +29,7 @@ from .nodes.group import GroupNode
 from .nodes.light import LightNode
 from .nodes.global_options import GlobalOptionsNode
 from .nodes.outputs_stub import OutputsStubNode
+from .nodes.input import InputNode
 
 # UI
 from .ui.node_categories import node_categories
@@ -49,6 +50,7 @@ classes = [
     StringSocket,
     SceneInstanceNode, TransformNode, GroupNode,
     LightNode, GlobalOptionsNode, OutputsStubNode,
+    InputNode,
     NODE_OT_sync_to_scene,
     SCENE_GRAPH_MT_add,
 ]

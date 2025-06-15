@@ -80,6 +80,11 @@ def _evaluate_outputs_stub(node):
     print(f"[scene_nodes] outputs {path} format={fmt}")
 
 
+def _evaluate_input(node):
+    val = _socket_value(node, "Value", None)
+    print(f"[scene_nodes] input value={val}")
+
+
 def _evaluate_node(node):
     ntype = node.bl_idname
     if ntype == "SceneInstanceNodeType":
@@ -94,6 +99,8 @@ def _evaluate_node(node):
         _evaluate_global_options(node)
     elif ntype == "OutputsStubNodeType":
         _evaluate_outputs_stub(node)
+    elif ntype == "InputNodeType":
+        _evaluate_input(node)
     else:
         print(f"[scene_nodes] unknown node type {ntype}")
 
