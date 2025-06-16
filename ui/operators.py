@@ -64,15 +64,22 @@ class RENDER_OT_render_pass_wedge(bpy.types.Operator):
             self.report({'ERROR'}, "No Render Passes node found")
             return {'CANCELLED'}
 
-        for item in passes_node.passes:
-            # Ensure a view layer exists for this pass
-            layer = context.scene.view_layers.get(item.name)
-            if layer is None:
-                layer = context.scene.view_layers.new(name=item.name)
-            context.window.view_layer = layer
+        original_scene = context.window.scene
+        original_layer = context.window.view_layer
 
+        for item in passes_node.passes:
             setattr(context, "render_pass", item.name)
             evaluate_scene_tree(tree)
+
+            scene = bpy.context.window.scene
+            layer = scene.view_layers.get(item.name)
+            if layer is None:
+                layer = scene.view_layers.new(name=item.name)
+            context.window.view_layer = layer
+
             bpy.ops.render.render(write_still=True)
+
+        context.window.scene = original_scene
+        context.window.view_layer = original_layer
 
         return {'FINISHED'}
