@@ -19,6 +19,8 @@ After enabling, you'll have a new **Scene Graph** tree type in the Node Editor.
 - Added **Join String** and **Split String** nodes for basic text manipulation.
 - New **Cycles Attributes** node lets you edit Cycles visibility flags with optional filtering.
 - Added **Alembic Import** node to load `.abc` files directly.
+- The **Render Pass Wedge** operator now creates view layers on the evaluated
+  scene and restores the original scene and view layer after rendering.
 
 ## Usage
 
