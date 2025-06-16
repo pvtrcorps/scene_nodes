@@ -24,6 +24,7 @@ from .nodes.base import (
 
 # Nodos individuales
 from .nodes.scene_instance import SceneInstanceNode
+from .nodes.alembic_import import AlembicImportNode
 from .nodes.transform import TransformNode
 from .nodes.group import GroupNode
 from .nodes.light import LightNode
@@ -55,7 +56,7 @@ classes = [
     BoolSocket,
     VectorSocket,
     StringSocket,
-    SceneInstanceNode, TransformNode, GroupNode,
+    SceneInstanceNode, AlembicImportNode, TransformNode, GroupNode,
     LightNode, GlobalOptionsNode, OutputsStubNode, SceneOutputNode, InputNode,
     JoinStringNode, SplitStringNode,
     ScenePropertiesNode, RenderPropertiesNode, OutputPropertiesNode,

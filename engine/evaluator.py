@@ -138,6 +138,69 @@ def _evaluate_scene_instance(node, _inputs, scene):
     return collection
 
 
+def _evaluate_alembic_import(node, _inputs, scene):
+    filepath = (
+        _socket_value(node, "File Path", getattr(node, "file_path", ""))
+        if getattr(node, "use_file_path", False)
+        else ""
+    )
+    if not filepath:
+        node.scene_nodes_output = None
+        return None
+
+    scale = (
+        _socket_value(node, "Scale", getattr(node, "scale", 1.0))
+        if getattr(node, "use_scale", False)
+        else getattr(node, "scale", 1.0)
+    )
+    set_frame_range = (
+        _socket_value(node, "Set Frame Range", getattr(node, "set_frame_range", True))
+        if getattr(node, "use_set_frame_range", False)
+        else getattr(node, "set_frame_range", True)
+    )
+    validate_meshes = (
+        _socket_value(node, "Validate Meshes", getattr(node, "validate_meshes", False))
+        if getattr(node, "use_validate_meshes", False)
+        else getattr(node, "validate_meshes", False)
+    )
+    add_cache_reader = (
+        _socket_value(node, "Add Cache Reader", getattr(node, "always_add_cache_reader", False))
+        if getattr(node, "use_always_add_cache_reader", False)
+        else getattr(node, "always_add_cache_reader", False)
+    )
+    is_sequence = (
+        _socket_value(node, "Is Sequence", getattr(node, "is_sequence", False))
+        if getattr(node, "use_is_sequence", False)
+        else getattr(node, "is_sequence", False)
+    )
+    background_job = (
+        _socket_value(node, "Background Job", getattr(node, "as_background_job", False))
+        if getattr(node, "use_as_background_job", False)
+        else getattr(node, "as_background_job", False)
+    )
+
+    existing = set(scene.objects)
+    bpy.ops.wm.alembic_import(
+        filepath=filepath,
+        as_background_job=background_job,
+        set_frame_range=set_frame_range,
+        validate_meshes=validate_meshes,
+        is_sequence=is_sequence,
+        scale=scale,
+        always_add_cache_reader=add_cache_reader,
+    )
+
+    collection = bpy.data.collections.new(name=f"{node.name}_abc")
+    scene.collection.children.link(collection)
+    for obj in scene.objects:
+        if obj not in existing:
+            collection.objects.link(obj)
+            scene.collection.objects.unlink(obj)
+
+    node.scene_nodes_output = collection
+    return collection
+
+
 def _evaluate_transform(node, inputs):
     t = (
         Vector(
@@ -449,6 +512,8 @@ def _evaluate_node(node, scene):
     ntype = node.bl_idname
     if ntype == "SceneInstanceNodeType":
         return _evaluate_scene_instance(node, inputs, scene)
+    elif ntype == "AlembicImportNodeType":
+        return _evaluate_alembic_import(node, inputs, scene)
     elif ntype == "TransformNodeType":
         return _evaluate_transform(node, inputs)
     elif ntype == "GroupNodeType":
