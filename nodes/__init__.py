@@ -11,11 +11,12 @@ from .split_string import SplitStringNode
 from .scene_properties import ScenePropertiesNode
 from .render_properties import RenderPropertiesNode
 from .output_properties import OutputPropertiesNode
+from .cycles_attributes import CyclesAttributesNode
 
 __all__ = [
     "SceneInstanceNode", "TransformNode", "GroupNode",
     "LightNode", "GlobalOptionsNode", "OutputsStubNode",
     "SceneOutputNode", "InputNode", "ScenePropertiesNode",
     "RenderPropertiesNode", "OutputPropertiesNode",
-    "JoinStringNode", "SplitStringNode",
+    "CyclesAttributesNode", "JoinStringNode", "SplitStringNode",
 ]

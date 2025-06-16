@@ -17,6 +17,7 @@ After enabling, you'll have a new **Scene Graph** tree type in the Node Editor.
 - Render Properties node now adjusts its parameters depending on the selected render engine.
 - Scene and Output nodes expose additional settings such as frame range, FPS and color mode.
 - Added **Join String** and **Split String** nodes for basic text manipulation.
+- New **Cycles Attributes** node lets you edit Cycles visibility flags with optional filtering.
 
 ## Usage
 
@@ -47,6 +48,10 @@ tree.links.new(inst.outputs[0], out.inputs[0])
 # Evaluate the tree (applies changes to the scene)
 evaluate_scene_tree(tree)
 ```
+
+Nodes that modify objects, such as **Transform** and **Cycles Attributes**, support
+an optional *Filter* property. The expression can include wildcards to match
+object names or collection paths, allowing selective updates.
 
 ## Migration
 

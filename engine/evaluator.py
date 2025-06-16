@@ -1,5 +1,6 @@
 import bpy
 from mathutils import Vector
+from .filters import filter_objects
 
 
 def _prepare_scene(name="Scene Nodes"):
@@ -160,10 +161,19 @@ def _evaluate_transform(node, inputs):
         else Vector((1.0, 1.0, 1.0))
     )
 
+    filter_expr = (
+        _socket_value(node, "Filter", getattr(node, "filter_expr", ""))
+        if getattr(node, "use_filter_expr", False)
+        else ""
+    )
+
     for coll in inputs:
         if coll is None:
             continue
-        for obj in coll.objects:
+        objs = coll.objects
+        if filter_expr:
+            objs = list(filter_objects(objs, filter_expr))
+        for obj in objs:
             obj.location = Vector(obj.location) + t
             obj.rotation_euler = Vector(obj.rotation_euler) + r
             obj.scale = Vector(obj.scale) * s
@@ -320,6 +330,61 @@ def _evaluate_outputs_stub(node, _inputs, scene):
     return node.scene_nodes_output
 
 
+def _evaluate_cycles_attributes(node, inputs, scene):
+    filter_expr = (
+        _socket_value(node, "Filter", getattr(node, "filter_expr", ""))
+        if getattr(node, "use_filter_expr", False)
+        else ""
+    )
+
+    for coll in inputs:
+        if coll is None:
+            continue
+        objs = coll.objects
+        if filter_expr:
+            objs = list(filter_objects(objs, filter_expr))
+        for obj in objs:
+            if getattr(node, "use_hide_render", False):
+                obj.hide_render = bool(
+                    _socket_value(node, "Hide Render", getattr(node, "hide_render", False))
+                )
+            if getattr(node, "use_is_shadow_catcher", False):
+                obj.is_shadow_catcher = bool(
+                    _socket_value(node, "Shadow Catcher", getattr(node, "is_shadow_catcher", False))
+                )
+            if getattr(node, "use_is_holdout", False):
+                obj.is_holdout = bool(
+                    _socket_value(node, "Holdout", getattr(node, "is_holdout", False))
+                )
+            if getattr(node, "use_visible_camera", False):
+                obj.visible_camera = bool(
+                    _socket_value(node, "Visible Camera", getattr(node, "visible_camera", True))
+                )
+            if getattr(node, "use_visible_diffuse", False):
+                obj.visible_diffuse = bool(
+                    _socket_value(node, "Visible Diffuse", getattr(node, "visible_diffuse", True))
+                )
+            if getattr(node, "use_visible_glossy", False):
+                obj.visible_glossy = bool(
+                    _socket_value(node, "Visible Glossy", getattr(node, "visible_glossy", True))
+                )
+            if getattr(node, "use_visible_transmission", False):
+                obj.visible_transmission = bool(
+                    _socket_value(node, "Visible Transmission", getattr(node, "visible_transmission", True))
+                )
+            if getattr(node, "use_visible_volume_scatter", False):
+                obj.visible_volume_scatter = bool(
+                    _socket_value(node, "Visible Volume", getattr(node, "visible_volume_scatter", True))
+                )
+            if getattr(node, "use_visible_shadow", False):
+                obj.visible_shadow = bool(
+                    _socket_value(node, "Visible Shadow", getattr(node, "visible_shadow", True))
+                )
+
+    node.scene_nodes_output = inputs[0] if inputs else None
+    return node.scene_nodes_output
+
+
 def _evaluate_join_string(node, _inputs, _scene):
     s1 = (
         _socket_value(node, "String 1", getattr(node, "string1", ""))
@@ -388,6 +453,8 @@ def _evaluate_node(node, scene):
         return _evaluate_transform(node, inputs)
     elif ntype == "GroupNodeType":
         return _evaluate_group(node, inputs, scene)
+    elif ntype == "CyclesAttributesNodeType":
+        return _evaluate_cycles_attributes(node, inputs, scene)
     elif ntype == "LightNodeType":
         return _evaluate_light(node, inputs, scene)
     elif ntype == "GlobalOptionsNodeType":
