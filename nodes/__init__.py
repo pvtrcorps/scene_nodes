@@ -12,6 +12,13 @@ from .split_string import SplitStringNode
 from .cycles_properties import CyclesPropertiesNode
 from .eevee_properties import EeveePropertiesNode
 from .cycles_attributes import CyclesAttributesNode
+from .render_passes import (
+    RenderPassesNode,
+    RenderPassItem,
+    SCENE_NODES_UL_render_passes,
+    SCENE_NODES_OT_render_pass_add,
+    SCENE_NODES_OT_render_pass_remove,
+)
 
 __all__ = [
     "SceneInstanceNode", "AlembicImportNode", "TransformNode", "GroupNode",
@@ -19,4 +26,8 @@ __all__ = [
     "SceneOutputNode", "InputNode",
     "CyclesPropertiesNode", "EeveePropertiesNode",
     "CyclesAttributesNode", "JoinStringNode", "SplitStringNode",
+    "RenderPassesNode", "RenderPassItem",
+    "SCENE_NODES_UL_render_passes",
+    "SCENE_NODES_OT_render_pass_add",
+    "SCENE_NODES_OT_render_pass_remove",
 ]

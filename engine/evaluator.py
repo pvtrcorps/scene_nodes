@@ -1,4 +1,5 @@
 import bpy
+import types
 from mathutils import Vector
 from .filters import filter_objects
 
@@ -73,7 +74,7 @@ def _collect_input_scenes(node):
     return scenes
 
 
-def _evaluate_scene_instance(node, _inputs, scene):
+def _evaluate_scene_instance(node, _inputs, scene, context):
     filepath = (
         _socket_value(node, "File Path", getattr(node, "file_path", ""))
         if getattr(node, "use_file_path", False)
@@ -138,7 +139,7 @@ def _evaluate_scene_instance(node, _inputs, scene):
     return collection
 
 
-def _evaluate_alembic_import(node, _inputs, scene):
+def _evaluate_alembic_import(node, _inputs, scene, context):
     filepath = (
         _socket_value(node, "File Path", getattr(node, "file_path", ""))
         if getattr(node, "use_file_path", False)
@@ -201,7 +202,7 @@ def _evaluate_alembic_import(node, _inputs, scene):
     return collection
 
 
-def _evaluate_transform(node, inputs):
+def _evaluate_transform(node, inputs, context):
     t = (
         Vector(
             _socket_value(node, "Translate", getattr(node, "translate", (0.0, 0.0, 0.0)))
@@ -245,7 +246,7 @@ def _evaluate_transform(node, inputs):
     return node.scene_nodes_output
 
 
-def _evaluate_group(node, inputs, scene):
+def _evaluate_group(node, inputs, scene, context):
     collection = bpy.data.collections.new(name=f"{node.name}_group")
     scene.collection.children.link(collection)
     for coll in inputs:
@@ -259,7 +260,7 @@ def _evaluate_group(node, inputs, scene):
     return collection
 
 
-def _evaluate_light(node, _inputs, scene):
+def _evaluate_light(node, _inputs, scene, context):
     ltype = (
         _socket_value(node, "Type", getattr(node, "light_type", "POINT"))
         if getattr(node, "use_light_type", False)
@@ -289,7 +290,7 @@ def _evaluate_light(node, _inputs, scene):
     return node.scene_nodes_output
 
 
-def _evaluate_global_options(node, _inputs, scene):
+def _evaluate_global_options(node, _inputs, scene, context):
     if getattr(node, "use_res_x", False):
         res_x = _socket_value(node, "Resolution X", getattr(node, "res_x", 1920))
         scene.render.resolution_x = res_x
@@ -311,7 +312,7 @@ def _evaluate_global_options(node, _inputs, scene):
     return node.scene_nodes_output
 
 
-def _evaluate_cycles_properties(node, _inputs, scene):
+def _evaluate_cycles_properties(node, _inputs, scene, context):
     scene.render.engine = "CYCLES"
 
     if getattr(node, "use_res_x", False):
@@ -353,7 +354,7 @@ def _evaluate_cycles_properties(node, _inputs, scene):
     return node.scene_nodes_output
 
 
-def _evaluate_eevee_properties(node, _inputs, scene):
+def _evaluate_eevee_properties(node, _inputs, scene, context):
     scene.render.engine = "BLENDER_EEVEE"
 
     if getattr(node, "use_res_x", False):
@@ -395,7 +396,7 @@ def _evaluate_eevee_properties(node, _inputs, scene):
     return node.scene_nodes_output
 
 
-def _evaluate_outputs_stub(node, _inputs, scene):
+def _evaluate_outputs_stub(node, _inputs, scene, context):
     if getattr(node, "use_filepath", False):
         path = _socket_value(node, "File Path", getattr(node, "filepath", ""))
         scene.render.filepath = path
@@ -407,7 +408,7 @@ def _evaluate_outputs_stub(node, _inputs, scene):
     return node.scene_nodes_output
 
 
-def _evaluate_cycles_attributes(node, inputs, scene):
+def _evaluate_cycles_attributes(node, inputs, scene, context):
     filter_expr = (
         _socket_value(node, "Filter", getattr(node, "filter_expr", ""))
         if getattr(node, "use_filter_expr", False)
@@ -462,7 +463,7 @@ def _evaluate_cycles_attributes(node, inputs, scene):
     return node.scene_nodes_output
 
 
-def _evaluate_join_string(node, _inputs, _scene):
+def _evaluate_join_string(node, _inputs, _scene, context):
     s1 = (
         _socket_value(node, "String 1", getattr(node, "string1", ""))
         if getattr(node, "use_string1", False)
@@ -486,7 +487,7 @@ def _evaluate_join_string(node, _inputs, _scene):
     return None
 
 
-def _evaluate_split_string(node, _inputs, _scene):
+def _evaluate_split_string(node, _inputs, _scene, context):
     text = (
         _socket_value(node, "String", getattr(node, "string", ""))
         if getattr(node, "use_string", False)
@@ -511,47 +512,47 @@ def _evaluate_split_string(node, _inputs, _scene):
     return None
 
 
-def _evaluate_input(node, _inputs, _scene):
+def _evaluate_input(node, _inputs, _scene, context):
     node.scene_nodes_output = None
     return None
 
 
-def _evaluate_scene_output(node, inputs, scene):
+def _evaluate_scene_output(node, inputs, scene, context):
     node.scene_nodes_output = inputs[0] if inputs else None
     return node.scene_nodes_output
 
 
-def _evaluate_node(node, scene):
+def _evaluate_node(node, scene, context):
     inputs = _collect_input_scenes(node)
     ntype = node.bl_idname
     if ntype == "SceneInstanceNodeType":
-        return _evaluate_scene_instance(node, inputs, scene)
+        return _evaluate_scene_instance(node, inputs, scene, context)
     elif ntype == "AlembicImportNodeType":
-        return _evaluate_alembic_import(node, inputs, scene)
+        return _evaluate_alembic_import(node, inputs, scene, context)
     elif ntype == "TransformNodeType":
-        return _evaluate_transform(node, inputs)
+        return _evaluate_transform(node, inputs, context)
     elif ntype == "GroupNodeType":
-        return _evaluate_group(node, inputs, scene)
+        return _evaluate_group(node, inputs, scene, context)
     elif ntype == "CyclesAttributesNodeType":
-        return _evaluate_cycles_attributes(node, inputs, scene)
+        return _evaluate_cycles_attributes(node, inputs, scene, context)
     elif ntype == "LightNodeType":
-        return _evaluate_light(node, inputs, scene)
+        return _evaluate_light(node, inputs, scene, context)
     elif ntype == "GlobalOptionsNodeType":
-        return _evaluate_global_options(node, inputs, scene)
+        return _evaluate_global_options(node, inputs, scene, context)
     elif ntype == "CyclesPropertiesNodeType":
-        return _evaluate_cycles_properties(node, inputs, scene)
+        return _evaluate_cycles_properties(node, inputs, scene, context)
     elif ntype == "EeveePropertiesNodeType":
-        return _evaluate_eevee_properties(node, inputs, scene)
+        return _evaluate_eevee_properties(node, inputs, scene, context)
     elif ntype == "OutputsStubNodeType":
-        return _evaluate_outputs_stub(node, inputs, scene)
+        return _evaluate_outputs_stub(node, inputs, scene, context)
     elif ntype == "SceneOutputNodeType":
-        return _evaluate_scene_output(node, inputs, scene)
+        return _evaluate_scene_output(node, inputs, scene, context)
     elif ntype == "InputNodeType":
-        return _evaluate_input(node, inputs, scene)
+        return _evaluate_input(node, inputs, scene, context)
     elif ntype == "JoinStringNodeType":
-        return _evaluate_join_string(node, inputs, scene)
+        return _evaluate_join_string(node, inputs, scene, context)
     elif ntype == "SplitStringNodeType":
-        return _evaluate_split_string(node, inputs, scene)
+        return _evaluate_split_string(node, inputs, scene, context)
     else:
         print(f"[scene_nodes] unknown node type {ntype}")
 
@@ -575,9 +576,11 @@ def evaluate_scene_tree(tree):
             raise RuntimeError(f"Duplicate scene name '{name}'")
         names.append(name)
 
+    context = types.SimpleNamespace()
     for out, name in zip(outputs, names):
         scene = _prepare_scene(name)
+        context.render_pass = name
         order = _topological_sort([out])
         for node in order:
-            node.scene_nodes_output = _evaluate_node(node, scene)
+            node.scene_nodes_output = _evaluate_node(node, scene, context)
 
