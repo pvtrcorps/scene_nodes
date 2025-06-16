@@ -54,7 +54,7 @@ from .nodes.render_passes import (
 
 # UI
 from .ui.node_categories import node_categories
-from .ui.operators import NODE_OT_sync_to_scene
+from .ui.operators import NODE_OT_sync_to_scene, RENDER_OT_render_pass_wedge
 from . import ui
 
 # Engine
@@ -80,7 +80,7 @@ classes = [
     RenderPassesNode, RenderPassItem,
     SCENE_NODES_UL_render_passes,
     SCENE_NODES_OT_render_pass_add, SCENE_NODES_OT_render_pass_remove,
-    NODE_OT_sync_to_scene,
+    NODE_OT_sync_to_scene, RENDER_OT_render_pass_wedge,
 ]
 
 NODETREE_CATEGORY = 'SCENE_NODES'
