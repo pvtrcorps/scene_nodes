@@ -7,6 +7,9 @@ class RenderPropertiesNode(BaseNode):
     bl_label = "Render Properties"
 
     def update_engine(self, _context=None):
+        sock = self.inputs.get("Engine")
+        if sock is not None:
+            sock.value = self.engine
         if self.engine == "BLENDER_EEVEE":
             self.remove_property_socket("max_bounces")
             if getattr(self, "use_motion_blur", False):

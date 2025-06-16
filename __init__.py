@@ -37,7 +37,6 @@ from .nodes.output_properties import OutputPropertiesNode
 
 # UI
 from .ui.node_categories import node_categories
-from .ui.node_editor import SCENE_GRAPH_MT_add
 from .ui.operators import NODE_OT_sync_to_scene
 from . import ui
 
@@ -57,7 +56,6 @@ classes = [
     LightNode, GlobalOptionsNode, OutputsStubNode, SceneOutputNode, InputNode,
     ScenePropertiesNode, RenderPropertiesNode, OutputPropertiesNode,
     NODE_OT_sync_to_scene,
-    SCENE_GRAPH_MT_add,
 ]
 
 NODETREE_CATEGORY = 'SCENE_NODES'
