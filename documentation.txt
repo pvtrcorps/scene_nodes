@@ -64,6 +64,17 @@ Crea una luz en la escena.
 - **Energy**: potencia de la luz.
 - **Color**: color de la luz.
 
+### Join String
+Concatena dos textos usando un delimitador.
+- **String 1**: primera cadena.
+- **String 2**: segunda cadena.
+- **Delimiter**: texto a insertar entre ambas.
+
+### Split String
+Divide un texto en dos partes según un separador.
+- **String**: cadena a dividir.
+- **Separator**: separador utilizado para la división.
+
 ### Scene Properties
 Define opciones generales de la escena.
 - **Resolution X/Y**: resolución de render.

@@ -31,6 +31,8 @@ from .nodes.global_options import GlobalOptionsNode
 from .nodes.outputs_stub import OutputsStubNode
 from .nodes.scene_output import SceneOutputNode
 from .nodes.input import InputNode
+from .nodes.join_string import JoinStringNode
+from .nodes.split_string import SplitStringNode
 from .nodes.scene_properties import ScenePropertiesNode
 from .nodes.render_properties import RenderPropertiesNode
 from .nodes.output_properties import OutputPropertiesNode
@@ -54,6 +56,7 @@ classes = [
     StringSocket,
     SceneInstanceNode, TransformNode, GroupNode,
     LightNode, GlobalOptionsNode, OutputsStubNode, SceneOutputNode, InputNode,
+    JoinStringNode, SplitStringNode,
     ScenePropertiesNode, RenderPropertiesNode, OutputPropertiesNode,
     NODE_OT_sync_to_scene,
 ]

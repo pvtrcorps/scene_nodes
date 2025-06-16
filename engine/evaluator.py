@@ -320,6 +320,55 @@ def _evaluate_outputs_stub(node, _inputs, scene):
     return node.scene_nodes_output
 
 
+def _evaluate_join_string(node, _inputs, _scene):
+    s1 = (
+        _socket_value(node, "String 1", getattr(node, "string1", ""))
+        if getattr(node, "use_string1", False)
+        else getattr(node, "string1", "")
+    )
+    s2 = (
+        _socket_value(node, "String 2", getattr(node, "string2", ""))
+        if getattr(node, "use_string2", False)
+        else getattr(node, "string2", "")
+    )
+    delim = (
+        _socket_value(node, "Delimiter", getattr(node, "delimiter", ""))
+        if getattr(node, "use_delimiter", False)
+        else getattr(node, "delimiter", "")
+    )
+    result = delim.join([s1, s2]) if delim else s1 + s2
+    out = node.outputs.get("String")
+    if out is not None:
+        out.value = result
+    node.scene_nodes_output = None
+    return None
+
+
+def _evaluate_split_string(node, _inputs, _scene):
+    text = (
+        _socket_value(node, "String", getattr(node, "string", ""))
+        if getattr(node, "use_string", False)
+        else getattr(node, "string", "")
+    )
+    sep = (
+        _socket_value(node, "Separator", getattr(node, "separator", ""))
+        if getattr(node, "use_separator", False)
+        else getattr(node, "separator", "")
+    )
+    parts = text.split(sep, 1) if sep else [text]
+    first = parts[0] if parts else ""
+    second = parts[1] if len(parts) > 1 else ""
+    if node.outputs:
+        out1 = node.outputs.get("Part 1")
+        if out1 is not None:
+            out1.value = first
+        out2 = node.outputs.get("Part 2")
+        if out2 is not None:
+            out2.value = second
+    node.scene_nodes_output = None
+    return None
+
+
 def _evaluate_input(node, _inputs, _scene):
     node.scene_nodes_output = None
     return None
@@ -355,6 +404,10 @@ def _evaluate_node(node, scene):
         return _evaluate_scene_output(node, inputs, scene)
     elif ntype == "InputNodeType":
         return _evaluate_input(node, inputs, scene)
+    elif ntype == "JoinStringNodeType":
+        return _evaluate_join_string(node, inputs, scene)
+    elif ntype == "SplitStringNodeType":
+        return _evaluate_split_string(node, inputs, scene)
     else:
         print(f"[scene_nodes] unknown node type {ntype}")
 

@@ -16,6 +16,7 @@ After enabling, you'll have a new **Scene Graph** tree type in the Node Editor.
 
 - Render Properties node now adjusts its parameters depending on the selected render engine.
 - Scene and Output nodes expose additional settings such as frame range, FPS and color mode.
+- Added **Join String** and **Split String** nodes for basic text manipulation.
 
 ## Usage
 
