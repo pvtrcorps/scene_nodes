@@ -12,12 +12,22 @@ bpy.context = types.SimpleNamespace(window=types.SimpleNamespace())
 bpy.utils = types.SimpleNamespace(register_class=lambda *a, **k: None,
                                   unregister_class=lambda *a, **k: None)
 bpy.types = types.ModuleType("bpy.types")
-bpy.props = types.SimpleNamespace(FloatProperty=lambda **k: None, IntProperty=lambda **k: None, BoolProperty=lambda **k: None, FloatVectorProperty=lambda **k: None, StringProperty=lambda **k: None, EnumProperty=lambda **k: None)
+bpy.props = types.SimpleNamespace(
+    FloatProperty=lambda **k: None,
+    IntProperty=lambda **k: None,
+    BoolProperty=lambda **k: None,
+    FloatVectorProperty=lambda **k: None,
+    StringProperty=lambda **k: None,
+    EnumProperty=lambda **k: None,
+    CollectionProperty=lambda **k: None,
+)
 bpy.types.NodeTree = type("NodeTree", (), {})
 bpy.types.Node = type("Node", (), {})
 bpy.types.NodeSocket = type("NodeSocket", (), {})
 bpy.types.Operator = type("Operator", (), {})
 bpy.types.Panel = type("Panel", (), {})
+bpy.types.PropertyGroup = type("PropertyGroup", (), {})
+bpy.types.UIList = type("UIList", (), {})
 sys.modules.setdefault("bpy", bpy)
 sys.modules.setdefault("bpy.types", bpy.types)
 
@@ -69,7 +79,8 @@ def test_cycles_properties():
         use_color_mode=True, color_mode="RGBA",
     )
     scene = FakeScene()
-    evaluator._evaluate_cycles_properties(node, [], scene)
+    ctx = types.SimpleNamespace(render_pass="")
+    evaluator._evaluate_cycles_properties(node, [], scene, ctx)
 
     assert scene.render.engine == "CYCLES"
     assert scene.render.resolution_x == 1280
@@ -100,7 +111,8 @@ def test_eevee_properties():
         use_color_mode=True, color_mode="RGB",
     )
     scene = FakeScene()
-    evaluator._evaluate_eevee_properties(node, [], scene)
+    ctx = types.SimpleNamespace(render_pass="")
+    evaluator._evaluate_eevee_properties(node, [], scene, ctx)
 
     assert scene.render.engine == "BLENDER_EEVEE"
     assert scene.render.resolution_x == 1024

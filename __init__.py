@@ -37,6 +37,13 @@ from .nodes.split_string import SplitStringNode
 from .nodes.cycles_properties import CyclesPropertiesNode
 from .nodes.eevee_properties import EeveePropertiesNode
 from .nodes.cycles_attributes import CyclesAttributesNode
+from .nodes.render_passes import (
+    RenderPassesNode,
+    RenderPassItem,
+    SCENE_NODES_UL_render_passes,
+    SCENE_NODES_OT_render_pass_add,
+    SCENE_NODES_OT_render_pass_remove,
+)
 
 # UI
 from .ui.node_categories import node_categories
@@ -60,6 +67,9 @@ classes = [
     JoinStringNode, SplitStringNode,
     CyclesPropertiesNode, EeveePropertiesNode,
     CyclesAttributesNode,
+    RenderPassesNode, RenderPassItem,
+    SCENE_NODES_UL_render_passes,
+    SCENE_NODES_OT_render_pass_add, SCENE_NODES_OT_render_pass_remove,
     NODE_OT_sync_to_scene,
 ]
 

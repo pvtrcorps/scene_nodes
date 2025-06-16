@@ -10,12 +10,22 @@ bpy.utils = types.SimpleNamespace(register_class=lambda *a, **k: None, unregiste
 bpy.data = types.SimpleNamespace()
 bpy.context = types.SimpleNamespace()
 bpy.types = types.ModuleType("bpy.types")
-bpy.props = types.SimpleNamespace(FloatProperty=lambda **k: None, IntProperty=lambda **k: None, BoolProperty=lambda **k: None, FloatVectorProperty=lambda **k: None, StringProperty=lambda **k: None, EnumProperty=lambda **k: None)
+bpy.props = types.SimpleNamespace(
+    FloatProperty=lambda **k: None,
+    IntProperty=lambda **k: None,
+    BoolProperty=lambda **k: None,
+    FloatVectorProperty=lambda **k: None,
+    StringProperty=lambda **k: None,
+    EnumProperty=lambda **k: None,
+    CollectionProperty=lambda **k: None,
+)
 bpy.types.NodeTree = type("NodeTree", (), {})
 bpy.types.Node = type("Node", (), {})
 bpy.types.NodeSocket = type("NodeSocket", (), {})
 bpy.types.Operator = type("Operator", (), {})
 bpy.types.Panel = type("Panel", (), {})
+bpy.types.PropertyGroup = type("PropertyGroup", (), {})
+bpy.types.UIList = type("UIList", (), {})
 sys.modules.setdefault("bpy", bpy)
 sys.modules.setdefault("bpy.types", bpy.types)
 mathutils = types.ModuleType("mathutils")
