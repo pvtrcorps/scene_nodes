@@ -20,6 +20,7 @@ node_categories = [
         NodeItem("ScenePropertiesNodeType"),
         NodeItem("RenderPropertiesNodeType"),
         NodeItem("OutputPropertiesNodeType"),
+        NodeItem("CyclesAttributesNodeType"),
         NodeItem("SceneOutputNodeType"),
     ])
 ]

@@ -20,5 +20,6 @@ build_props_and_sockets(
         ("translate", "vector", {"name": "Translate", "size": 3}),
         ("rotate", "vector", {"name": "Rotate", "size": 3}),
         ("scale", "vector", {"name": "Scale", "size": 3, "default": (1, 1, 1)}),
+        ("filter_expr", "string", {"name": "Filter"}),
     ],
 )

@@ -36,6 +36,7 @@ from .nodes.split_string import SplitStringNode
 from .nodes.scene_properties import ScenePropertiesNode
 from .nodes.render_properties import RenderPropertiesNode
 from .nodes.output_properties import OutputPropertiesNode
+from .nodes.cycles_attributes import CyclesAttributesNode
 
 # UI
 from .ui.node_categories import node_categories
@@ -58,6 +59,7 @@ classes = [
     LightNode, GlobalOptionsNode, OutputsStubNode, SceneOutputNode, InputNode,
     JoinStringNode, SplitStringNode,
     ScenePropertiesNode, RenderPropertiesNode, OutputPropertiesNode,
+    CyclesAttributesNode,
     NODE_OT_sync_to_scene,
 ]
 
