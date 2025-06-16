@@ -11,6 +11,8 @@ node_categories = [
         NodeItem("SceneInstanceNodeType"),
         NodeItem("TransformNodeType"),
         NodeItem("InputNodeType"),
+        NodeItem("JoinStringNodeType"),
+        NodeItem("SplitStringNodeType"),
         NodeItem("GroupNodeType"),
         NodeItem("LightNodeType"),
         NodeItem("GlobalOptionsNodeType"),

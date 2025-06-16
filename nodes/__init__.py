@@ -6,6 +6,8 @@ from .global_options import GlobalOptionsNode
 from .outputs_stub import OutputsStubNode
 from .scene_output import SceneOutputNode
 from .input import InputNode
+from .join_string import JoinStringNode
+from .split_string import SplitStringNode
 from .scene_properties import ScenePropertiesNode
 from .render_properties import RenderPropertiesNode
 from .output_properties import OutputPropertiesNode
@@ -15,4 +17,5 @@ __all__ = [
     "LightNode", "GlobalOptionsNode", "OutputsStubNode",
     "SceneOutputNode", "InputNode", "ScenePropertiesNode",
     "RenderPropertiesNode", "OutputPropertiesNode",
+    "JoinStringNode", "SplitStringNode",
 ]
