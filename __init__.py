@@ -34,9 +34,8 @@ from .nodes.scene_output import SceneOutputNode
 from .nodes.input import InputNode
 from .nodes.join_string import JoinStringNode
 from .nodes.split_string import SplitStringNode
-from .nodes.scene_properties import ScenePropertiesNode
-from .nodes.render_properties import RenderPropertiesNode
-from .nodes.output_properties import OutputPropertiesNode
+from .nodes.cycles_properties import CyclesPropertiesNode
+from .nodes.eevee_properties import EeveePropertiesNode
 from .nodes.cycles_attributes import CyclesAttributesNode
 
 # UI
@@ -59,7 +58,7 @@ classes = [
     SceneInstanceNode, AlembicImportNode, TransformNode, GroupNode,
     LightNode, GlobalOptionsNode, OutputsStubNode, SceneOutputNode, InputNode,
     JoinStringNode, SplitStringNode,
-    ScenePropertiesNode, RenderPropertiesNode, OutputPropertiesNode,
+    CyclesPropertiesNode, EeveePropertiesNode,
     CyclesAttributesNode,
     NODE_OT_sync_to_scene,
 ]

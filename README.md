@@ -14,8 +14,8 @@ After enabling, you'll have a new **Scene Graph** tree type in the Node Editor.
 
 ## New in this version
 
-- Render Properties node now adjusts its parameters depending on the selected render engine.
-- Scene and Output nodes expose additional settings such as frame range, FPS and color mode.
+- New **Cycles Properties** and **Eevee Properties** nodes combine scene, render
+  and output settings for each engine.
 - Added **Join String** and **Split String** nodes for basic text manipulation.
 - New **Cycles Attributes** node lets you edit Cycles visibility flags with optional filtering.
 - Added **Alembic Import** node to load `.abc` files directly.
@@ -41,7 +41,7 @@ tree = bpy.data.node_groups.new("Example", "SceneNodeTreeType")
 
 # Add nodes
 inst = tree.nodes.new("SceneInstanceNodeType")
-out = tree.nodes.new("OutputPropertiesNodeType")
+out = tree.nodes.new("EeveePropertiesNodeType")
 
 # Link instance to output
 tree.links.new(inst.outputs[0], out.inputs[0])
@@ -56,4 +56,4 @@ object names or collection paths, allowing selective updates.
 
 ## Migration
 
-Global Options and Render Outputs nodes have been replaced by **Scene Properties**, **Render Properties** and **Output Properties**. Update existing trees by inserting the new nodes in place of the old ones.
+Global Options and Render Outputs nodes have been replaced by **Cycles Properties** and **Eevee Properties**.
