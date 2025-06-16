@@ -9,6 +9,7 @@ class SceneNodeCategory(NodeCategory):
 node_categories = [
     SceneNodeCategory('SCENE_NODES', "Scene Nodes", items=[
         NodeItem("SceneInstanceNodeType"),
+        NodeItem("AlembicImportNodeType"),
         NodeItem("TransformNodeType"),
         NodeItem("InputNodeType"),
         NodeItem("JoinStringNodeType"),

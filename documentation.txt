@@ -49,6 +49,16 @@ Crea una instancia de otro archivo `.blend`.
 - En modo `Instance` el nodo elimina instancias previas para evitar duplicados.
 - En modo `Link Override` se crea una biblioteca sobreescrita real en vez de un `Append`.
 
+### Alembic Import
+Importa un archivo `.abc` y lo coloca dentro de la escena.
+- **File Path**: ruta del archivo Alembic.
+- **Scale**: factor de escala aplicado a los objetos importados.
+- **Set Frame Range**: ajusta el rango de fotogramas a los del archivo.
+- **Validate Meshes**: comprueba la validez de las mallas al importar.
+- **Add Cache Reader**: añade modificadores de caché incluso si no hay animación.
+- **Is Sequence**: activa si el caché está dividido en varios archivos.
+- **Background Job**: ejecuta la importación en segundo plano.
+
 ### Transform
 Aplica transformaciones básicas.
 - **Translate**: desplazamiento (XYZ).

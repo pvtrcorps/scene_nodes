@@ -1,4 +1,5 @@
 from .scene_instance import SceneInstanceNode
+from .alembic_import import AlembicImportNode
 from .transform import TransformNode
 from .group import GroupNode
 from .light import LightNode
@@ -14,7 +15,7 @@ from .output_properties import OutputPropertiesNode
 from .cycles_attributes import CyclesAttributesNode
 
 __all__ = [
-    "SceneInstanceNode", "TransformNode", "GroupNode",
+    "SceneInstanceNode", "AlembicImportNode", "TransformNode", "GroupNode",
     "LightNode", "GlobalOptionsNode", "OutputsStubNode",
     "SceneOutputNode", "InputNode", "ScenePropertiesNode",
     "RenderPropertiesNode", "OutputPropertiesNode",

@@ -18,6 +18,7 @@ After enabling, you'll have a new **Scene Graph** tree type in the Node Editor.
 - Scene and Output nodes expose additional settings such as frame range, FPS and color mode.
 - Added **Join String** and **Split String** nodes for basic text manipulation.
 - New **Cycles Attributes** node lets you edit Cycles visibility flags with optional filtering.
+- Added **Alembic Import** node to load `.abc` files directly.
 
 ## Usage
 
