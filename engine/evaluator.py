@@ -311,14 +311,14 @@ def _evaluate_global_options(node, _inputs, scene):
     return node.scene_nodes_output
 
 
-def _evaluate_scene_properties(node, _inputs, scene):
+def _evaluate_cycles_properties(node, _inputs, scene):
+    scene.render.engine = "CYCLES"
+
     if getattr(node, "use_res_x", False):
-        res_x = _socket_value(node, "Resolution X", getattr(node, "res_x", 1920))
-        scene.render.resolution_x = res_x
+        scene.render.resolution_x = _socket_value(node, "Resolution X", getattr(node, "res_x", 1920))
 
     if getattr(node, "use_res_y", False):
-        res_y = _socket_value(node, "Resolution Y", getattr(node, "res_y", 1080))
-        scene.render.resolution_y = res_y
+        scene.render.resolution_y = _socket_value(node, "Resolution Y", getattr(node, "res_y", 1080))
 
     if getattr(node, "use_frame_start", False):
         scene.frame_start = _socket_value(node, "Frame Start", getattr(node, "frame_start", scene.frame_start))
@@ -334,48 +334,62 @@ def _evaluate_scene_properties(node, _inputs, scene):
         if camera_path in bpy.data.objects:
             scene.camera = bpy.data.objects[camera_path]
 
-    node.scene_nodes_output = scene.collection
-    return node.scene_nodes_output
+    if getattr(node, "use_samples", False):
+        scene.cycles.samples = _socket_value(node, "Samples", getattr(node, "samples", 64))
 
+    if getattr(node, "use_max_bounces", False):
+        scene.cycles.max_bounces = _socket_value(node, "Max Bounces", getattr(node, "max_bounces", 8))
 
-def _evaluate_render_properties(node, _inputs, scene):
-    if getattr(node, "use_engine", False):
-        engine = _socket_value(node, "Engine", getattr(node, "engine", "BLENDER_EEVEE"))
-        scene.render.engine = engine
-    else:
-        engine = scene.render.engine
-
-    if engine == "CYCLES":
-        if getattr(node, "use_samples", False):
-            samples = _socket_value(node, "Samples", getattr(node, "samples", 64))
-            scene.cycles.samples = samples
-        if getattr(node, "use_max_bounces", False):
-            mb = _socket_value(node, "Max Bounces", getattr(node, "max_bounces", 8))
-            scene.cycles.max_bounces = mb
-    elif engine == "BLENDER_EEVEE":
-        if getattr(node, "use_samples", False):
-            samples = _socket_value(node, "Samples", getattr(node, "samples", 64))
-            scene.eevee.taa_render_samples = samples
-        if getattr(node, "use_motion_blur", False):
-            blur = _socket_value(node, "Motion Blur", getattr(node, "motion_blur", False))
-            scene.eevee.use_motion_blur = blur
-    
-    node.scene_nodes_output = scene.collection
-    return node.scene_nodes_output
-
-
-def _evaluate_output_properties(node, _inputs, scene):
     if getattr(node, "use_filepath", False):
-        path = _socket_value(node, "File Path", getattr(node, "filepath", ""))
-        scene.render.filepath = path
+        scene.render.filepath = _socket_value(node, "File Path", getattr(node, "filepath", ""))
 
     if getattr(node, "use_file_format", False):
-        fmt = _socket_value(node, "Format", getattr(node, "file_format", "OPEN_EXR"))
-        scene.render.image_settings.file_format = fmt
+        scene.render.image_settings.file_format = _socket_value(node, "Format", getattr(node, "file_format", "OPEN_EXR"))
 
     if getattr(node, "use_color_mode", False):
-        mode = _socket_value(node, "Color", getattr(node, "color_mode", "RGB"))
-        scene.render.image_settings.color_mode = mode
+        scene.render.image_settings.color_mode = _socket_value(node, "Color", getattr(node, "color_mode", "RGB"))
+
+    node.scene_nodes_output = scene.collection
+    return node.scene_nodes_output
+
+
+def _evaluate_eevee_properties(node, _inputs, scene):
+    scene.render.engine = "BLENDER_EEVEE"
+
+    if getattr(node, "use_res_x", False):
+        scene.render.resolution_x = _socket_value(node, "Resolution X", getattr(node, "res_x", 1920))
+
+    if getattr(node, "use_res_y", False):
+        scene.render.resolution_y = _socket_value(node, "Resolution Y", getattr(node, "res_y", 1080))
+
+    if getattr(node, "use_frame_start", False):
+        scene.frame_start = _socket_value(node, "Frame Start", getattr(node, "frame_start", scene.frame_start))
+
+    if getattr(node, "use_frame_end", False):
+        scene.frame_end = _socket_value(node, "Frame End", getattr(node, "frame_end", scene.frame_end))
+
+    if getattr(node, "use_fps", False):
+        scene.render.fps = _socket_value(node, "FPS", getattr(node, "fps", scene.render.fps))
+
+    if getattr(node, "use_camera_path", False):
+        camera_path = _socket_value(node, "Camera Path", getattr(node, "camera_path", ""))
+        if camera_path in bpy.data.objects:
+            scene.camera = bpy.data.objects[camera_path]
+
+    if getattr(node, "use_samples", False):
+        scene.eevee.taa_render_samples = _socket_value(node, "Samples", getattr(node, "samples", 64))
+
+    if getattr(node, "use_motion_blur", False):
+        scene.eevee.use_motion_blur = _socket_value(node, "Motion Blur", getattr(node, "motion_blur", False))
+
+    if getattr(node, "use_filepath", False):
+        scene.render.filepath = _socket_value(node, "File Path", getattr(node, "filepath", ""))
+
+    if getattr(node, "use_file_format", False):
+        scene.render.image_settings.file_format = _socket_value(node, "Format", getattr(node, "file_format", "OPEN_EXR"))
+
+    if getattr(node, "use_color_mode", False):
+        scene.render.image_settings.color_mode = _socket_value(node, "Color", getattr(node, "color_mode", "RGB"))
 
     node.scene_nodes_output = scene.collection
     return node.scene_nodes_output
@@ -524,12 +538,10 @@ def _evaluate_node(node, scene):
         return _evaluate_light(node, inputs, scene)
     elif ntype == "GlobalOptionsNodeType":
         return _evaluate_global_options(node, inputs, scene)
-    elif ntype == "ScenePropertiesNodeType":
-        return _evaluate_scene_properties(node, inputs, scene)
-    elif ntype == "RenderPropertiesNodeType":
-        return _evaluate_render_properties(node, inputs, scene)
-    elif ntype == "OutputPropertiesNodeType":
-        return _evaluate_output_properties(node, inputs, scene)
+    elif ntype == "CyclesPropertiesNodeType":
+        return _evaluate_cycles_properties(node, inputs, scene)
+    elif ntype == "EeveePropertiesNodeType":
+        return _evaluate_eevee_properties(node, inputs, scene)
     elif ntype == "OutputsStubNodeType":
         return _evaluate_outputs_stub(node, inputs, scene)
     elif ntype == "SceneOutputNodeType":

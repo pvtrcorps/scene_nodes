@@ -85,22 +85,26 @@ Divide un texto en dos partes según un separador.
 - **String**: cadena a dividir.
 - **Separator**: separador utilizado para la división.
 
-### Scene Properties
-Define opciones generales de la escena.
+### Cycles Properties
+Combina opciones de escena, render y salida para Cycles.
 - **Resolution X/Y**: resolución de render.
 - **Frame Start/End**: rango de cuadros para la animación.
 - **FPS**: fotogramas por segundo.
 - **Camera Path**: ruta a una cámara existente en el archivo.
-
-### Render Properties
-Ajustes del motor de render y el muestreo.
-- **Engine**: motor de render (Eevee, Cycles o Workbench).
 - **Samples**: número de muestras para el render.
-- **Motion Blur** (Eevee): habilitar desenfoque de movimiento.
-- **Max Bounces** (Cycles): número máximo de rebotes de la luz.
+- **Max Bounces**: número máximo de rebotes de la luz.
+- **File Path**: carpeta o archivo de destino.
+- **Format**: formato de imagen (OpenEXR o PNG).
+- **Color**: modo de color de la imagen.
 
-### Output Properties
-Establece datos básicos de salida.
+### Eevee Properties
+Combina opciones de escena, render y salida para Eevee.
+- **Resolution X/Y**: resolución de render.
+- **Frame Start/End**: rango de cuadros para la animación.
+- **FPS**: fotogramas por segundo.
+- **Camera Path**: ruta a una cámara existente en el archivo.
+- **Samples**: número de muestras para el render.
+- **Motion Blur**: habilitar desenfoque de movimiento.
 - **File Path**: carpeta o archivo de destino.
 - **Format**: formato de imagen (OpenEXR o PNG).
 - **Color**: modo de color de la imagen.
@@ -132,17 +136,14 @@ lateral del Node Editor con **N**. En la pestaña **Node** encontrarás el panel
 **Node Properties** con casillas "Use ..." que activan o desactivan los
 sockets correspondientes. Si el socket está activo pero sin ninguna conexión,
 su valor puede modificarse directamente desde este panel.
-
 Flujo de trabajo recomendado
 ---------------------------
-1. Empieza con nodos **Scene Properties** y **Render Properties** para configurar la escena.
+1. Empieza con nodos **Cycles Properties** o **Eevee Properties** para configurar la escena.
 2. Añade instancias o grupos según sea necesario.
 3. Inserta nodos **Transform** para posicionar los elementos.
 4. Utiliza **Light** para iluminar.
-5. Añade un nodo **Output Properties** si necesitas configurar la salida.
-6. Cierra el árbol con **Scene Output** para crear la escena.
-7. Ejecuta **Sync to Scene** para aplicar los cambios.
-
+5. Cierra el árbol con **Scene Output** para crear la escena.
+6. Ejecuta **Sync to Scene** para aplicar los cambios.
 Ten en cuenta que este complemento sigue siendo experimental, pero ahora la
 evaluación del árbol aplica los cambios directamente en la escena de Blender en
 lugar de limitarse a imprimir información en la consola. Sirve como base para
@@ -150,6 +151,6 @@ futuros flujos de trabajo nodales de ensamblaje de escenas.
 
 Actualización
 -------------
-Los nodos **Global Options** y **Render Outputs** se han dividido en **Scene Properties**, **Render Properties** y **Output Properties**.
+Los nodos **Global Options**, **Scene Properties**, **Render Properties** y **Output Properties** se han combinado en **Cycles Properties** y **Eevee Properties**.
 
 ---
