@@ -34,6 +34,13 @@ from .nodes.scene_output import SceneOutputNode
 from .nodes.input import InputNode
 from .nodes.join_string import JoinStringNode
 from .nodes.split_string import SplitStringNode
+from .nodes.name_switch import (
+    NameSwitchNode,
+    NameSwitchItem,
+    SCENE_NODES_UL_name_switch,
+    SCENE_NODES_OT_name_switch_add,
+    SCENE_NODES_OT_name_switch_remove,
+)
 from .nodes.cycles_properties import CyclesPropertiesNode
 from .nodes.eevee_properties import EeveePropertiesNode
 from .nodes.cycles_attributes import CyclesAttributesNode
@@ -65,6 +72,9 @@ classes = [
     SceneInstanceNode, AlembicImportNode, TransformNode, GroupNode,
     LightNode, GlobalOptionsNode, OutputsStubNode, SceneOutputNode, InputNode,
     JoinStringNode, SplitStringNode,
+    NameSwitchNode, NameSwitchItem,
+    SCENE_NODES_UL_name_switch, SCENE_NODES_OT_name_switch_add,
+    SCENE_NODES_OT_name_switch_remove,
     CyclesPropertiesNode, EeveePropertiesNode,
     CyclesAttributesNode,
     RenderPassesNode, RenderPassItem,

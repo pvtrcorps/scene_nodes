@@ -14,6 +14,7 @@ node_categories = [
         NodeItem("InputNodeType"),
         NodeItem("JoinStringNodeType"),
         NodeItem("SplitStringNodeType"),
+        NodeItem("NameSwitchNodeType"),
         NodeItem("GroupNodeType"),
         NodeItem("LightNodeType"),
         NodeItem("GlobalOptionsNodeType"),

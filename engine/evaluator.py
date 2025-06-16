@@ -512,6 +512,27 @@ def _evaluate_split_string(node, _inputs, _scene, context):
     return None
 
 
+def _evaluate_name_switch(node, _inputs, _scene, context):
+    target = getattr(context, "render_pass", "")
+    chosen = None
+    default = None
+    for sock in node.inputs:
+        if sock.bl_idname != "SceneSocketType" or not sock.is_linked:
+            continue
+        if not sock.links:
+            continue
+        scene_in = getattr(sock.links[0].from_node, "scene_nodes_output", None)
+        if sock.name == target:
+            chosen = scene_in
+            break
+        if sock.name == "Default" and default is None:
+            default = scene_in
+    if chosen is None:
+        chosen = default
+    node.scene_nodes_output = chosen
+    return chosen
+
+
 def _evaluate_input(node, _inputs, _scene, context):
     node.scene_nodes_output = None
     return None
@@ -553,6 +574,8 @@ def _evaluate_node(node, scene, context):
         return _evaluate_join_string(node, inputs, scene, context)
     elif ntype == "SplitStringNodeType":
         return _evaluate_split_string(node, inputs, scene, context)
+    elif ntype == "NameSwitchNodeType":
+        return _evaluate_name_switch(node, inputs, scene, context)
     else:
         print(f"[scene_nodes] unknown node type {ntype}")
 
