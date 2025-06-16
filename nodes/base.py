@@ -111,7 +111,7 @@ def build_props_and_sockets(cls, descriptors):
         setattr(cls, attr, prop)
         annotations[attr] = prop
         label = kwargs.get("name", attr)
-        cls._prop_defs.append((attr, label, socket_id))
+        cls._prop_defs.append((attr, label, socket_id, typ))
 
         # Boolean property controlling the socket visibility
         bool_name = f"use_{attr}"
@@ -139,21 +139,21 @@ class BaseNode(Node):
 
     def add_property_sockets(self):
         """Instantiate sockets for all defined properties."""
-        for attr, _label, _socket in getattr(self.__class__, "_prop_defs", []):
+        for attr, _label, _socket, _typ in getattr(self.__class__, "_prop_defs", []):
             self.add_property_socket(attr)
 
     # ------------------------------------------------------------------
     # Socket management helpers
     # ------------------------------------------------------------------
     def _find_prop_def(self, attr):
-        for a, label, socket in getattr(self.__class__, "_prop_defs", []):
+        for a, label, socket, typ in getattr(self.__class__, "_prop_defs", []):
             if a == attr:
-                return label, socket
-        return None, None
+                return label, socket, typ
+        return None, None, None
 
     def add_property_socket(self, attr):
         """Add the socket corresponding to *attr* if it doesn't exist."""
-        label, socket = self._find_prop_def(attr)
+        label, socket, _typ = self._find_prop_def(attr)
         if label is None:
             return
         if self.inputs.get(label) is not None:
@@ -168,7 +168,7 @@ class BaseNode(Node):
         new_index = len(self.inputs) - 1
         order_map = {
             lbl: idx
-            for idx, (_a, lbl, _s) in enumerate(
+            for idx, (_a, lbl, _s, _t) in enumerate(
                 getattr(self.__class__, "_prop_defs", [])
             )
         }
@@ -187,7 +187,7 @@ class BaseNode(Node):
 
     def remove_property_socket(self, attr):
         """Remove the socket corresponding to *attr* if present."""
-        label, _socket = self._find_prop_def(attr)
+        label, _socket, _typ = self._find_prop_def(attr)
         if label is None:
             return
         sock = self.inputs.get(label)
@@ -203,7 +203,7 @@ class BaseNode(Node):
 
     def add_enabled_sockets(self):
         """Instantiate sockets only for properties with their use flag enabled."""
-        for attr, _label, _socket in getattr(self.__class__, "_prop_defs", []):
+        for attr, _label, _socket, _typ in getattr(self.__class__, "_prop_defs", []):
             if getattr(self, f"use_{attr}", False):
                 self.add_property_socket(attr)
 
