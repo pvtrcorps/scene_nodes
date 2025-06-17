@@ -38,6 +38,8 @@ También es posible evaluar el arbol mediante Python con:
 ```python
 from scene_nodes.engine import evaluate_scene_tree
 evaluate_scene_tree(mi_tree)
+# O especificar el nombre del render pass
+# evaluate_scene_tree(mi_tree, render_pass="MiPass")
 ```
 
 Nodos disponibles

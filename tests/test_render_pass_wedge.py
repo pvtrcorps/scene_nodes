@@ -65,7 +65,7 @@ class FakeScene:
 
 evaluated_scenes = []
 
-def fake_evaluate_scene_tree(tree):
+def fake_evaluate_scene_tree(tree, render_pass="Scene"):
     scene = FakeScene()
     evaluated_scenes.append(scene)
     bpy.context.window.scene = scene

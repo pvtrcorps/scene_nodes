@@ -641,8 +641,16 @@ def _evaluate_node(node, scene, context):
         print(f"[scene_nodes] unknown node type {ntype}")
 
 
-def evaluate_scene_tree(tree):
-    """Evaluate *tree* and execute Render nodes when present."""
+def evaluate_scene_tree(tree, render_pass="Scene"):
+    """Evaluate *tree* and execute Render nodes when present.
+
+    Parameters
+    ----------
+    tree : NodeTree
+        The scene node tree to evaluate.
+    render_pass : str, optional
+        Name of the active render pass when no Render nodes are present.
+    """
     if tree is None:
         raise ValueError("Scene node tree is None")
 
@@ -656,16 +664,16 @@ def evaluate_scene_tree(tree):
                     rnode,
                     "Name",
                     getattr(rnode, "scene_name", ""),
-                ) or "Scene"
+                ) or render_pass
             else:
-                context.render_pass = "Scene"
+                context.render_pass = render_pass
             scene = _prepare_scene()
             order = _topological_sort([rnode])
             for node in order:
                 node.scene_nodes_output = _evaluate_node(node, scene, context)
             bpy.ops.render.render(write_still=True)
     else:
-        context = types.SimpleNamespace(render_pass="Scene")
+        context = types.SimpleNamespace(render_pass=render_pass)
         scene = _prepare_scene()
         order = _topological_sort(list(tree.nodes))
         for node in order:
