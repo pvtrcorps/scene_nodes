@@ -39,9 +39,18 @@ nodeitems_utils.NodeItem = lambda *a, **k: None
 nodeitems_utils.NodeItem = lambda *a, **k: None
 sys.modules.setdefault("nodeitems_utils", nodeitems_utils)
 
-from scene_nodes.engine.filters import matches, object_path
+from scene_nodes.engine.filters import matches, object_path, filter_collections
 
 obj = SimpleNamespace(name="Cube", users_collection=[SimpleNamespace(name="Coll", parent=None)])
 assert object_path(obj) == "Coll/Cube"
 assert matches(obj, "Coll/*")
 assert matches(obj, "Cube")
+
+
+parent = SimpleNamespace(name="Parent", parent=None)
+child = SimpleNamespace(name="Child", parent=parent)
+other = SimpleNamespace(name="Other", parent=None)
+colls = [child, other]
+assert list(filter_collections(colls, "Parent/*")) == [child]
+assert list(filter_collections(colls, "*Child")) == [child]
+assert list(filter_collections(colls, "Other")) == [other]

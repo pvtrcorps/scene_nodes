@@ -27,3 +27,25 @@ def filter_objects(objects, pattern):
         if matches(obj, pattern):
             yield obj
 
+
+def _collection_path(coll):
+    """Return the hierarchical path for *coll* using parent names."""
+    parts = []
+    current = coll
+    while current is not None:
+        parts.append(current.name)
+        current = getattr(current, "parent", None)
+    parts.reverse()
+    return "/".join(parts)
+
+
+def filter_collections(collections, pattern):
+    """Yield collections from *collections* whose name or path matches *pattern*."""
+    for coll in collections:
+        if not pattern:
+            yield coll
+            continue
+        path = _collection_path(coll)
+        if fnmatch.fnmatchcase(path, pattern) or fnmatch.fnmatchcase(coll.name, pattern):
+            yield coll
+

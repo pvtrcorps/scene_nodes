@@ -50,6 +50,13 @@ Crea una instancia de otro archivo `.blend`.
 - En modo `Instance` el nodo elimina instancias previas para evitar duplicados.
 - En modo `Link Override` se crea una biblioteca sobreescrita real en vez de un `Append`.
 - **Filter**: permite cargar solo los objetos que coincidan con el patrón.
+  Si se deja **Collection Path** vacío, el filtro se aplica a los nombres de
+  las colecciones del archivo y se cargan todas las coincidencias. Por ejemplo:
+
+  ```
+  # Cargar todas las colecciones que empiecen por 'Env/'
+  Filter: Env/*
+  ```
 
 ### Alembic Import
 Importa un archivo `.abc` y lo coloca dentro de la escena.
