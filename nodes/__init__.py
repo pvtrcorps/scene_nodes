@@ -5,7 +5,7 @@ from .group import GroupNode
 from .light import LightNode
 from .global_options import GlobalOptionsNode
 from .outputs_stub import OutputsStubNode
-from .scene_output import SceneOutputNode
+from .render_node import RenderNode
 from .input import InputNode
 from .join_string import JoinStringNode
 from .split_string import SplitStringNode
@@ -30,7 +30,7 @@ from .render_passes import (
 __all__ = [
     "SceneInstanceNode", "AlembicImportNode", "TransformNode", "GroupNode",
     "LightNode", "GlobalOptionsNode", "OutputsStubNode",
-    "SceneOutputNode", "InputNode",
+    "RenderNode", "InputNode",
     "CyclesPropertiesNode", "EeveePropertiesNode",
     "CyclesAttributesNode", "JoinStringNode", "SplitStringNode",
     "NameSwitchNode", "NameSwitchItem",

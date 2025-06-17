@@ -23,6 +23,6 @@ node_categories = [
         NodeItem("CyclesPropertiesNodeType"),
         NodeItem("EeveePropertiesNodeType"),
         NodeItem("CyclesAttributesNodeType"),
-        NodeItem("SceneOutputNodeType"),
+        NodeItem("RenderNodeType"),
     ])
 ]

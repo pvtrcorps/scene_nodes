@@ -21,7 +21,7 @@ class SCENE_GRAPH_MT_add(Menu):
         layout.operator("node.add_node", text="Scene Properties").type = "ScenePropertiesNodeType"
         layout.operator("node.add_node", text="Render Properties").type = "RenderPropertiesNodeType"
         layout.operator("node.add_node", text="Output Properties").type = "OutputPropertiesNodeType"
-        layout.operator("node.add_node", text="Scene Output").type = "SceneOutputNodeType"
+        layout.operator("node.add_node", text="Render").type = "RenderNodeType"
 
 def menu_draw(self, context):
     if context.space_data.tree_type == 'SceneNodeTreeType':

@@ -30,7 +30,7 @@ from .nodes.group import GroupNode
 from .nodes.light import LightNode
 from .nodes.global_options import GlobalOptionsNode
 from .nodes.outputs_stub import OutputsStubNode
-from .nodes.scene_output import SceneOutputNode
+from .nodes.render_node import RenderNode
 from .nodes.input import InputNode
 from .nodes.join_string import JoinStringNode
 from .nodes.split_string import SplitStringNode
@@ -70,7 +70,7 @@ classes = [
     VectorSocket,
     StringSocket,
     SceneInstanceNode, AlembicImportNode, TransformNode, GroupNode,
-    LightNode, GlobalOptionsNode, OutputsStubNode, SceneOutputNode, InputNode,
+    LightNode, GlobalOptionsNode, OutputsStubNode, RenderNode, InputNode,
     JoinStringNode, SplitStringNode,
     NameSwitchItem, NameSwitchNode,
     SCENE_NODES_UL_name_switch, SCENE_NODES_OT_name_switch_add,
