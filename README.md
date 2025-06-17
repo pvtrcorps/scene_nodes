@@ -56,6 +56,10 @@ tree.links.new(props.outputs[0], render.inputs[0])
 
 # Evaluate the tree (applies changes to the scene)
 evaluate_scene_tree(tree)
+
+# You can also specify a render pass name when evaluating without
+# a Render node
+# evaluate_scene_tree(tree, render_pass="MyPass")
 ```
 
 Nodes that modify or load objects, such as **Transform**, **Cycles Attributes**
