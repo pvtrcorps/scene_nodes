@@ -75,9 +75,9 @@ class FakeLibLoad:
         self.data_to.collections = [self.collections[name] for name in self.data_to.collections]
         return False
 
-def make_env(src_collection):
+def make_env(collections):
     bpy.data = types.SimpleNamespace(
-        libraries=types.SimpleNamespace(load=lambda path, link=False: FakeLibLoad({"Coll": src_collection})),
+        libraries=types.SimpleNamespace(load=lambda path, link=False: FakeLibLoad(collections)),
         collections=types.SimpleNamespace(new=lambda name: FakeCollection(name), get=lambda name: None, remove=lambda coll: None),
         objects=types.SimpleNamespace(remove=lambda obj, do_unlink=True: None, new=lambda name, object_data=None: types.SimpleNamespace(name=name)),
     )
@@ -90,7 +90,7 @@ def test_scene_instance_no_filter():
     b = types.SimpleNamespace(name="B", users_collection=[src])
     src.objects.link(a)
     src.objects.link(b)
-    make_env(src)
+    make_env({"Coll": src})
 
     node = types.SimpleNamespace(
         inputs={},
@@ -114,7 +114,7 @@ def test_scene_instance_with_filter():
     b = types.SimpleNamespace(name="B", users_collection=[src])
     src.objects.link(a)
     src.objects.link(b)
-    make_env(src)
+    make_env({"Coll": src})
 
     node = types.SimpleNamespace(
         inputs={},
@@ -132,4 +132,30 @@ def test_scene_instance_with_filter():
     assert len(result.objects) == 1
     assert result.objects[0].name == "B"
     assert result in scene.collection.children
+
+
+def test_scene_instance_collection_filtering():
+    c1 = FakeCollection("CollA")
+    c2 = FakeCollection("CollB")
+    o1 = types.SimpleNamespace(name="A1", users_collection=[c1])
+    o2 = types.SimpleNamespace(name="B1", users_collection=[c2])
+    c1.objects.link(o1)
+    c2.objects.link(o2)
+    make_env({"CollA": c1, "CollB": c2})
+
+    node = types.SimpleNamespace(
+        name="Node",
+        inputs={},
+        use_file_path=True, file_path="dummy.blend",
+        use_collection_path=False, collection_path="",
+        use_load_mode=True, load_mode="APPEND",
+        use_filter_expr=True, filter_expr="Coll*",
+    )
+    scene = FakeScene()
+    ctx = types.SimpleNamespace(render_pass="")
+
+    result = evaluator._evaluate_scene_instance(node, [], scene, ctx)
+
+    assert result in scene.collection.children
+    assert len(result.objects) == 2
 

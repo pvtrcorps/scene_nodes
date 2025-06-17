@@ -1,5 +1,6 @@
 import bpy
 import types
+import fnmatch
 from mathutils import Vector
 from .filters import filter_objects
 
@@ -96,26 +97,45 @@ def _evaluate_scene_instance(node, _inputs, scene, context):
         if getattr(node, "use_filter_expr", False)
         else getattr(node, "filter_expr", "")
     )
-    if not filepath or not collection_path:
+    if not filepath:
         node.scene_nodes_output = None
         return None
 
     link = load_mode in {"LINK", "OVERRIDE"}
     with bpy.data.libraries.load(filepath, link=link) as (data_from, data_to):
-        if collection_path in data_from.collections:
-            data_to.collections = [collection_path]
+        if collection_path:
+            if collection_path in data_from.collections:
+                data_to.collections = [collection_path]
+        elif filter_expr:
+            matches = [name for name in data_from.collections if fnmatch.fnmatchcase(name, filter_expr)]
+            data_to.collections = matches
 
-    collection = data_to.collections[0] if data_to.collections else None
-    if collection is None:
+    collections = list(data_to.collections) if data_to.collections else []
+    if not collections:
         node.scene_nodes_output = None
         return None
 
-    if filter_expr:
-        objs = list(filter_objects(collection.objects, filter_expr))
-        filtered = bpy.data.collections.new(name=f"{collection.name}_filtered")
-        for obj in objs:
-            filtered.objects.link(obj)
-        collection = filtered
+    processed = []
+    for collection in collections:
+        coll = collection
+        if filter_expr and collection_path:
+            objs = list(filter_objects(coll.objects, filter_expr))
+            filtered = bpy.data.collections.new(name=f"{coll.name}_filtered")
+            for obj in objs:
+                filtered.objects.link(obj)
+            coll = filtered
+        processed.append(coll)
+
+    if len(processed) > 1:
+        # Create a wrapper collection combining all loaded collections
+        wrapper = bpy.data.collections.new(name=f"{node.name}_group")
+        for coll in processed:
+            for obj in coll.objects:
+                if obj.name not in wrapper.objects:
+                    wrapper.objects.link(obj)
+        collection = wrapper
+    else:
+        collection = processed[0]
 
     if load_mode == "OVERRIDE":
         # Link, create override and remove original link to avoid duplicates
