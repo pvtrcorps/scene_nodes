@@ -105,6 +105,7 @@ def test_evaluate_scene_tree_triggers_render():
     prev_ops = bpy_mod.ops.render
     bpy_mod.ops.render = types.SimpleNamespace(render=_render_stub)
 
+    _render_calls.clear()
     rnode = types.SimpleNamespace(bl_idname="RenderNodeType", inputs=[], use_scene_name=False)
     old_scene = bpy_mod.context.window.scene
     tree = types.SimpleNamespace(nodes=[rnode])
@@ -112,6 +113,32 @@ def test_evaluate_scene_tree_triggers_render():
     evaluator.evaluate_scene_tree(tree)
 
     assert len(_render_calls) == 1
+    assert bpy_mod.context.window.scene is not None
+
+    bpy_mod.ops.render = prev_ops
+    bpy_mod.context.window.scene = old_scene
+    evaluator.evaluate_scene_tree = patched
+
+
+def test_evaluate_scene_tree_without_render_node():
+    patched = evaluator.evaluate_scene_tree
+    reload(evaluator)
+
+    bpy_mod = evaluator.bpy
+    bpy_mod.data.scenes = FakeScenes()
+    bpy_mod.data.objects = types.SimpleNamespace(remove=lambda obj, do_unlink=True: None)
+    bpy_mod.data.collections = types.SimpleNamespace(remove=lambda coll: None)
+    prev_ops = bpy_mod.ops.render
+    bpy_mod.ops.render = types.SimpleNamespace(render=_render_stub)
+
+    _render_calls.clear()
+    inode = types.SimpleNamespace(bl_idname="InputNodeType", inputs=[])
+    old_scene = bpy_mod.context.window.scene
+    tree = types.SimpleNamespace(nodes=[inode])
+
+    evaluator.evaluate_scene_tree(tree)
+
+    assert len(_render_calls) == 0
     assert bpy_mod.context.window.scene is not None
 
     bpy_mod.ops.render = prev_ops

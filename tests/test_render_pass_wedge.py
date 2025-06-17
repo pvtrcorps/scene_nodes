@@ -76,6 +76,7 @@ evaluator.evaluate_scene_tree = fake_evaluate_scene_tree
 passes_node = types.SimpleNamespace(
     bl_idname="RenderPassesNodeType",
     passes=[types.SimpleNamespace(name="Pass1"), types.SimpleNamespace(name="Pass2")],
+    inputs=[],
 )
 tree = types.SimpleNamespace(bl_idname="SceneNodeTreeType", nodes=[passes_node])
 bpy.data.node_groups = [tree]

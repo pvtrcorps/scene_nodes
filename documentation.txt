@@ -25,8 +25,8 @@ Uso básico
 2. Añade nodos desde el menú **Add > Scene Node**.
 3. Conecta las salidas y entradas de tipo `Scene` entre nodos.
 4. Ejecuta el operador **Sync to Scene** (menú F3) para evaluar el árbol y
-   sincronizarlo con la escena de Blender. Cada nodo **Render** producirá
-   una imagen de salida.
+   sincronizarlo con la escena de Blender. Los nodos **Render**, si existen,
+   producirán una imagen de salida.
    El operador utiliza el árbol de Scene Graph activo en el Node Editor (o el
    primero que encuentre en el archivo), por lo que las escenas no necesitan
    tener un árbol asignado.
@@ -123,7 +123,7 @@ Ejecuta el render final y define la salida.
 - **Name**: nombre de la pasada de render.
 - **File Path**: ruta de la imagen resultante.
 - **Format**: formato de archivo (OpenEXR o PNG).
-Debe colocarse al final del árbol y es necesario para evaluar la escena.
+Suele colocarse al final del árbol y, cuando está presente, genera la imagen de salida.
 
 Conexión de propiedades
 -----------------------
@@ -146,7 +146,7 @@ Flujo de trabajo recomendado
 2. Añade instancias o grupos según sea necesario.
 3. Inserta nodos **Transform** para posicionar los elementos.
 4. Utiliza **Light** para iluminar.
-5. Finaliza con un nodo **Render** para generar la imagen.
+5. Si deseas generar una imagen, añade un nodo **Render** al final.
 6. Ejecuta **Sync to Scene** para aplicar y renderizar los cambios.
 Ten en cuenta que este complemento sigue siendo experimental, pero ahora la
 evaluación del árbol aplica los cambios directamente en la escena de Blender en

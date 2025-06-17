@@ -588,23 +588,32 @@ def _evaluate_node(node, scene, context):
 
 
 def evaluate_scene_tree(tree):
-    """Evaluate *tree* for every Render node found and render the result."""
+    """Evaluate *tree* and execute Render nodes when present."""
     if tree is None:
         raise ValueError("Scene node tree is None")
 
     renders = [n for n in tree.nodes if n.bl_idname == "RenderNodeType"]
-    if not renders:
-        raise RuntimeError("No Render node in the tree")
 
-    context = types.SimpleNamespace()
-    for rnode in renders:
-        if getattr(rnode, "use_scene_name", False):
-            context.render_pass = _socket_value(rnode, "Name", getattr(rnode, "scene_name", "")) or "Scene"
-        else:
-            context.render_pass = "Scene"
+    if renders:
+        context = types.SimpleNamespace()
+        for rnode in renders:
+            if getattr(rnode, "use_scene_name", False):
+                context.render_pass = _socket_value(
+                    rnode,
+                    "Name",
+                    getattr(rnode, "scene_name", ""),
+                ) or "Scene"
+            else:
+                context.render_pass = "Scene"
+            scene = _prepare_scene()
+            order = _topological_sort([rnode])
+            for node in order:
+                node.scene_nodes_output = _evaluate_node(node, scene, context)
+            bpy.ops.render.render(write_still=True)
+    else:
+        context = types.SimpleNamespace(render_pass="Scene")
         scene = _prepare_scene()
-        order = _topological_sort([rnode])
+        order = _topological_sort(list(tree.nodes))
         for node in order:
             node.scene_nodes_output = _evaluate_node(node, scene, context)
-        bpy.ops.render.render(write_still=True)
 
