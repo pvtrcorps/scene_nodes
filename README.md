@@ -63,3 +63,7 @@ object names or collection paths, allowing selective updates.
 ## Migration
 
 Global Options and Render Outputs nodes have been replaced by **Cycles Properties** and **Eevee Properties**.
+
+## License
+
+This project is licensed under the GNU General Public License v3.0. See [LICENSE](LICENSE) for more information.
