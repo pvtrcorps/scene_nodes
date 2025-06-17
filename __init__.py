@@ -21,7 +21,6 @@ from .nodes.base import (
     VectorSocket,
     StringSocket,
     EnumSocket,
-    EnumSocket,
 )
 
 # Nodos individuales
