@@ -4,8 +4,9 @@ from mathutils import Vector
 from .filters import filter_objects
 
 
-def _prepare_scene(name="Scene Nodes"):
-    """Return a clean scene to evaluate the node tree."""
+def _prepare_scene():
+    """Return a clean scene used to evaluate the node tree."""
+    name = "Scene Nodes"
     scene = bpy.data.scenes.get(name)
     if scene is None:
         scene = bpy.data.scenes.new(name)
@@ -538,7 +539,13 @@ def _evaluate_input(node, _inputs, _scene, context):
     return None
 
 
-def _evaluate_scene_output(node, inputs, scene, context):
+def _evaluate_render(node, inputs, scene, context):
+    if getattr(node, "use_filepath", False):
+        scene.render.filepath = _socket_value(node, "File Path", getattr(node, "filepath", ""))
+
+    if getattr(node, "use_file_format", False):
+        scene.render.image_settings.file_format = _socket_value(node, "Format", getattr(node, "file_format", "OPEN_EXR"))
+
     node.scene_nodes_output = inputs[0] if inputs else None
     return node.scene_nodes_output
 
@@ -566,8 +573,8 @@ def _evaluate_node(node, scene, context):
         return _evaluate_eevee_properties(node, inputs, scene, context)
     elif ntype == "OutputsStubNodeType":
         return _evaluate_outputs_stub(node, inputs, scene, context)
-    elif ntype == "SceneOutputNodeType":
-        return _evaluate_scene_output(node, inputs, scene, context)
+    elif ntype == "RenderNodeType":
+        return _evaluate_render(node, inputs, scene, context)
     elif ntype == "InputNodeType":
         return _evaluate_input(node, inputs, scene, context)
     elif ntype == "JoinStringNodeType":
@@ -581,29 +588,23 @@ def _evaluate_node(node, scene, context):
 
 
 def evaluate_scene_tree(tree):
-    """Evaluate *tree* for every Scene Output node found."""
+    """Evaluate *tree* for every Render node found and render the result."""
     if tree is None:
         raise ValueError("Scene node tree is None")
 
-    outputs = [n for n in tree.nodes if n.bl_idname == "SceneOutputNodeType"]
-    if not outputs:
-        raise RuntimeError("No Scene Output node in the tree")
-
-    names = []
-    for out in outputs:
-        if getattr(out, "use_scene_name", False):
-            name = _socket_value(out, "Name", getattr(out, "scene_name", "")) or "Scene"
-        else:
-            name = "Scene"
-        if name in names:
-            raise RuntimeError(f"Duplicate scene name '{name}'")
-        names.append(name)
+    renders = [n for n in tree.nodes if n.bl_idname == "RenderNodeType"]
+    if not renders:
+        raise RuntimeError("No Render node in the tree")
 
     context = types.SimpleNamespace()
-    for out, name in zip(outputs, names):
-        scene = _prepare_scene(name)
-        context.render_pass = name
-        order = _topological_sort([out])
+    for rnode in renders:
+        if getattr(rnode, "use_scene_name", False):
+            context.render_pass = _socket_value(rnode, "Name", getattr(rnode, "scene_name", "")) or "Scene"
+        else:
+            context.render_pass = "Scene"
+        scene = _prepare_scene()
+        order = _topological_sort([rnode])
         for node in order:
             node.scene_nodes_output = _evaluate_node(node, scene, context)
+        bpy.ops.render.render(write_still=True)
 
