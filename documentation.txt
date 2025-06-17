@@ -49,6 +49,7 @@ Crea una instancia de otro archivo `.blend`.
 - **Load Mode**: `Append`, `Instance`, `Link` o `Link Override`.
 - En modo `Instance` el nodo elimina instancias previas para evitar duplicados.
 - En modo `Link Override` se crea una biblioteca sobreescrita real en vez de un `Append`.
+- **Filter**: permite cargar solo los objetos que coincidan con el patrón.
 
 ### Alembic Import
 Importa un archivo `.abc` y lo coloca dentro de la escena.
@@ -132,8 +133,8 @@ Puedes conectar estos sockets entre distintos nodos para compartir el mismo
 valor. Si un socket está enlazado, el nodo tomará el valor de la conexión;
 de lo contrario utilizará el valor interno editable en el propio nodo.
 
-Algunos nodos que modifican objetos incluyen un campo **Filter** para limitar
-los cambios según un patrón de nombre o ruta de colección.
+Algunos nodos que modifican o cargan objetos incluyen un campo **Filter** para
+limitar los cambios o instancias según un patrón de nombre o ruta de colección.
 
 Para controlar qué sockets se muestran, selecciona un nodo y abre la barra
 lateral del Node Editor con **N**. En la pestaña **Node** encontrarás el panel

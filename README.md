@@ -56,9 +56,10 @@ tree.links.new(props.outputs[0], render.inputs[0])
 evaluate_scene_tree(tree)
 ```
 
-Nodes that modify objects, such as **Transform** and **Cycles Attributes**, support
-an optional *Filter* property. The expression can include wildcards to match
-object names or collection paths, allowing selective updates.
+Nodes that modify or load objects, such as **Transform**, **Cycles Attributes**
+and **Scene Instance**, support an optional *Filter* property. The expression can
+include wildcards to match object names or collection paths, allowing selective
+updates.
 
 ## Migration
 
