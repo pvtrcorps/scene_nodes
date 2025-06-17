@@ -81,6 +81,24 @@ class SCENE_NODES_PT_socket_visibility(bpy.types.Panel):
                         row.prop(sock, "value", text="")
 
 
+class SCENE_NODES_PT_operators(bpy.types.Panel):
+    """Panel with quick access to Scene Node operators."""
+    bl_idname = "SCENE_NODES_PT_operators"
+    bl_label = "Scene Node Operators"
+    bl_space_type = 'NODE_EDITOR'
+    bl_region_type = 'UI'
+    bl_category = 'Scene Nodes'
+
+    @classmethod
+    def poll(cls, context):
+        return context.space_data.tree_type == 'SceneNodeTreeType'
+
+    def draw(self, context):
+        layout = self.layout
+        layout.operator("scene_nodes.sync_to_scene")
+        layout.operator("scene_nodes.render_pass_wedge")
+
+
 class SCENE_NODES_PT_node_props_properties(SCENE_NODES_PT_node_props):
     bl_idname = "SCENE_NODES_PT_node_props_properties"
     bl_space_type = 'PROPERTIES'
@@ -90,9 +108,11 @@ def register():
     bpy.utils.register_class(SCENE_NODES_PT_node_props)
     bpy.utils.register_class(SCENE_NODES_PT_node_props_properties)
     bpy.utils.register_class(SCENE_NODES_PT_socket_visibility)
+    bpy.utils.register_class(SCENE_NODES_PT_operators)
 
 
 def unregister():
     bpy.utils.unregister_class(SCENE_NODES_PT_socket_visibility)
+    bpy.utils.unregister_class(SCENE_NODES_PT_operators)
     bpy.utils.unregister_class(SCENE_NODES_PT_node_props_properties)
     bpy.utils.unregister_class(SCENE_NODES_PT_node_props)

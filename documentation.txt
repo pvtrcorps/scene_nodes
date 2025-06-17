@@ -27,6 +27,8 @@ Uso básico
 4. Ejecuta el operador **Sync to Scene** (menú F3) para evaluar el árbol y
    sincronizarlo con la escena de Blender. Los nodos **Render**, si existen,
    producirán una imagen de salida.
+   También puedes acceder a este y otros operadores desde la pestaña
+   **Scene Nodes** en el panel lateral (**N**).
    El operador utiliza el árbol de Scene Graph activo en el Node Editor (o el
    primero que encuentre en el archivo), por lo que las escenas no necesitan
    tener un árbol asignado.
@@ -156,6 +158,8 @@ Flujo de trabajo recomendado
 4. Utiliza **Light** para iluminar.
 5. Si deseas generar una imagen, añade un nodo **Render** al final.
 6. Ejecuta **Sync to Scene** para aplicar y renderizar los cambios.
+   El panel lateral (**N**) incluye accesos directos a los operadores
+   disponibles.
 Ten en cuenta que este complemento sigue siendo experimental, pero ahora la
 evaluación del árbol aplica los cambios directamente en la escena de Blender en
 lugar de limitarse a imprimir información en la consola. Sirve como base para

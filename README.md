@@ -29,6 +29,8 @@ After enabling, you'll have a new **Scene Graph** tree type in the Node Editor.
 3. Connect them with the provided `Scene` sockets.
 
 The tree can be evaluated via the **Sync to Scene** operator (accessible with **F3**) or from a Python script.
+You can also find shortcuts to this and other operators in the **Scene Nodes**
+tab of the side panel (**N**).
 The operator uses the Scene Graph tree currently open in the Node Editor (or the
 first one it finds in the file) so scenes don't need their own tree pointer.
 When present, **Render** nodes in the tree produce output images during evaluation.
