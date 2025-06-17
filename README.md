@@ -31,6 +31,7 @@ After enabling, you'll have a new **Scene Graph** tree type in the Node Editor.
 The tree can be evaluated via the **Sync to Scene** operator (accessible with **F3**) or from a Python script.
 The operator uses the Scene Graph tree currently open in the Node Editor (or the
 first one it finds in the file) so scenes don't need their own tree pointer.
+Each **Render** node in the tree produces an output image during evaluation.
 
 ## Quick Example
 
@@ -41,12 +42,15 @@ from scene_nodes.engine import evaluate_scene_tree
 # Create a Scene Node Tree
 tree = bpy.data.node_groups.new("Example", "SceneNodeTreeType")
 
+
 # Add nodes
 inst = tree.nodes.new("SceneInstanceNodeType")
-out = tree.nodes.new("EeveePropertiesNodeType")
+props = tree.nodes.new("EeveePropertiesNodeType")
+render = tree.nodes.new("RenderNodeType")
 
-# Link instance to output
-tree.links.new(inst.outputs[0], out.inputs[0])
+# Link instance to properties and then to render
+tree.links.new(inst.outputs[0], props.inputs[0])
+tree.links.new(props.outputs[0], render.inputs[0])
 
 # Evaluate the tree (applies changes to the scene)
 evaluate_scene_tree(tree)
