@@ -1,5 +1,28 @@
 import bpy
 
+
+def draw_node_properties(layout, node):
+    """Draw UI elements for node properties and socket visibility."""
+    for attr, label, _socket, typ in getattr(node.__class__, '_prop_defs', []):
+        if hasattr(node, "is_property_visible") and not node.is_property_visible(attr):
+            continue
+        prop_name = f"use_{attr}"
+        if not hasattr(node, prop_name):
+            continue
+
+        row = layout.row(align=True)
+        row.prop(node, prop_name, text=label, toggle=True)
+
+        if getattr(node, prop_name):
+            sock = node.inputs.get(label)
+            if sock is not None and not sock.is_linked:
+                if typ == "enum":
+                    row.prop(node, attr, text="")
+                    if getattr(node, attr) != sock.value:
+                        sock.value = getattr(node, attr)
+                else:
+                    row.prop(sock, "value", text="")
+
 class SCENE_NODES_PT_node_props(bpy.types.Panel):
     bl_idname = "SCENE_NODES_PT_node_props"
     bl_label = "Node Properties"
@@ -20,25 +43,7 @@ class SCENE_NODES_PT_node_props(bpy.types.Panel):
         if node is None:
             node = getattr(context, "node", None)
         layout = self.layout
-        for attr, label, _socket, typ in getattr(node.__class__, '_prop_defs', []):
-            if hasattr(node, "is_property_visible") and not node.is_property_visible(attr):
-                continue
-            prop_name = f"use_{attr}"
-            if not hasattr(node, prop_name):
-                continue
-
-            row = layout.row(align=True)
-            row.prop(node, prop_name, text=label, toggle=True)
-
-            if getattr(node, prop_name):
-                sock = node.inputs.get(label)
-                if sock is not None and not sock.is_linked:
-                    if typ == "enum":
-                        row.prop(node, attr, text="")
-                        if getattr(node, attr) != sock.value:
-                            sock.value = getattr(node, attr)
-                    else:
-                        row.prop(sock, "value", text="")
+        draw_node_properties(layout, node)
 
 
 class SCENE_NODES_PT_socket_visibility(bpy.types.Panel):
@@ -60,25 +65,7 @@ class SCENE_NODES_PT_socket_visibility(bpy.types.Panel):
         if node is None:
             node = getattr(context, "node", None)
         layout = self.layout
-        for attr, label, _socket, typ in getattr(node.__class__, '_prop_defs', []):
-            if hasattr(node, "is_property_visible") and not node.is_property_visible(attr):
-                continue
-            prop_name = f"use_{attr}"
-            if not hasattr(node, prop_name):
-                continue
-
-            row = layout.row(align=True)
-            row.prop(node, prop_name, text=label, toggle=True)
-
-            if getattr(node, prop_name):
-                sock = node.inputs.get(label)
-                if sock is not None and not sock.is_linked:
-                    if typ == "enum":
-                        row.prop(node, attr, text="")
-                        if getattr(node, attr) != sock.value:
-                            sock.value = getattr(node, attr)
-                    else:
-                        row.prop(sock, "value", text="")
+        draw_node_properties(layout, node)
 
 
 class SCENE_NODES_PT_operators(bpy.types.Panel):
