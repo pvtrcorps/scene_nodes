@@ -28,7 +28,8 @@ bpy.types.Operator = type("Operator", (), {})
 bpy.types.Panel = type("Panel", (), {})
 bpy.types.PropertyGroup = type("PropertyGroup", (), {})
 bpy.types.UIList = type("UIList", (), {})
-bpy.ops = types.SimpleNamespace(render=types.SimpleNamespace(render=lambda **k: None))
+render_calls = []
+bpy.ops = types.SimpleNamespace(render=types.SimpleNamespace(render=lambda **k: render_calls.append(k)))
 
 sys.modules["bpy"] = bpy
 sys.modules["bpy.types"] = bpy.types
@@ -94,6 +95,7 @@ def test_render_pass_wedge_creates_layers_and_restores():
     assert bpy.context.window.scene is original_scene
     assert bpy.context.window.view_layer is original_layer
     assert len(evaluated_scenes) == 2
+    assert len(render_calls) == 2
     assert "Pass1" in evaluated_scenes[0].view_layers
     assert "Pass2" in evaluated_scenes[1].view_layers
     assert "Pass1" not in original_scene.view_layers
