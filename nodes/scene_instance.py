@@ -44,5 +44,6 @@ build_props_and_sockets(
                 "default": "APPEND",
             },
         ),
+        ("filter_expr", "string", {"name": "Filter"}),
     ],
 )

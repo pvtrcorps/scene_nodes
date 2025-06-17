@@ -91,6 +91,11 @@ def _evaluate_scene_instance(node, _inputs, scene, context):
         if getattr(node, "use_load_mode", False)
         else getattr(node, "load_mode", "APPEND")
     )
+    filter_expr = (
+        _socket_value(node, "Filter", getattr(node, "filter_expr", ""))
+        if getattr(node, "use_filter_expr", False)
+        else getattr(node, "filter_expr", "")
+    )
     if not filepath or not collection_path:
         node.scene_nodes_output = None
         return None
@@ -104,6 +109,13 @@ def _evaluate_scene_instance(node, _inputs, scene, context):
     if collection is None:
         node.scene_nodes_output = None
         return None
+
+    if filter_expr:
+        objs = list(filter_objects(collection.objects, filter_expr))
+        filtered = bpy.data.collections.new(name=f"{collection.name}_filtered")
+        for obj in objs:
+            filtered.objects.link(obj)
+        collection = filtered
 
     if load_mode == "OVERRIDE":
         # Link, create override and remove original link to avoid duplicates
