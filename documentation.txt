@@ -42,7 +42,7 @@ Nodos disponibles
 -----------------
 A continuación se describen los nodos incluidos y sus propiedades más relevantes.
 
-### Scene Instance
+### Blend Input
 Crea una instancia de otro archivo `.blend`.
 - **File Path**: ruta del archivo.
 - **Collection Path**: colección dentro del archivo a instanciar.

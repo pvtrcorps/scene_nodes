@@ -76,13 +76,34 @@ class StringSocket(NodeSocket):
     def draw_color(self, context, node):
         return (0.7, 0.7, 0.7, 1.0)
 
+
+class EnumSocket(NodeSocket):
+    bl_idname = "EnumSocketType"
+    bl_label = "Enum"
+
+    value: bpy.props.StringProperty()
+
+    def draw(self, context, layout, node, text):
+        attr = getattr(self, "scene_nodes_attr", None)
+        if attr and hasattr(node, attr):
+            layout.prop(node, attr, text=text)
+            try:
+                self.value = getattr(node, attr)
+            except Exception:
+                pass
+        else:
+            layout.prop(self, "value", text=text)
+
+    def draw_color(self, context, node):
+        return (0.7, 0.7, 0.7, 1.0)
+
 PROPERTY_SOCKET_MAP = {
     'float': (bpy.props.FloatProperty, 'FloatSocketType'),
     'int': (bpy.props.IntProperty, 'IntSocketType'),
     'bool': (bpy.props.BoolProperty, 'BoolSocketType'),
     'vector': (bpy.props.FloatVectorProperty, 'VectorSocketType'),
     'string': (bpy.props.StringProperty, 'StringSocketType'),
-    'enum': (bpy.props.EnumProperty, 'StringSocketType'),
+    'enum': (bpy.props.EnumProperty, 'EnumSocketType'),
 }
 
 
@@ -159,6 +180,7 @@ class BaseNode(Node):
         if self.inputs.get(label) is not None:
             return
         sock = self.inputs.new(socket, label)
+        sock.scene_nodes_attr = attr
         try:
             sock.value = getattr(self, attr)
         except Exception:

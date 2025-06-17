@@ -102,7 +102,7 @@ def test_scene_instance_no_filter():
     scene = FakeScene()
     ctx = types.SimpleNamespace(render_pass="")
 
-    result = evaluator._evaluate_scene_instance(node, [], scene, ctx)
+    result = evaluator._evaluate_blend_input(node, [], scene, ctx)
 
     assert result is src
     assert src in scene.collection.children
@@ -126,7 +126,7 @@ def test_scene_instance_with_filter():
     scene = FakeScene()
     ctx = types.SimpleNamespace(render_pass="")
 
-    result = evaluator._evaluate_scene_instance(node, [], scene, ctx)
+    result = evaluator._evaluate_blend_input(node, [], scene, ctx)
 
     assert result is not src
     assert len(result.objects) == 1
@@ -154,7 +154,7 @@ def test_scene_instance_collection_filtering():
     scene = FakeScene()
     ctx = types.SimpleNamespace(render_pass="")
 
-    result = evaluator._evaluate_scene_instance(node, [], scene, ctx)
+    result = evaluator._evaluate_blend_input(node, [], scene, ctx)
 
     assert result in scene.collection.children
     assert len(result.objects) == 2

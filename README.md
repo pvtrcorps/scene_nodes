@@ -44,7 +44,7 @@ tree = bpy.data.node_groups.new("Example", "SceneNodeTreeType")
 
 
 # Add nodes
-inst = tree.nodes.new("SceneInstanceNodeType")
+inst = tree.nodes.new("BlendInputNodeType")
 props = tree.nodes.new("EeveePropertiesNodeType")
 render = tree.nodes.new("RenderNodeType")
 
@@ -57,7 +57,7 @@ evaluate_scene_tree(tree)
 ```
 
 Nodes that modify or load objects, such as **Transform**, **Cycles Attributes**
-and **Scene Instance**, support an optional *Filter* property. The expression can
+and **Blend Input**, support an optional *Filter* property. The expression can
 include wildcards to match object names or collection paths, allowing selective
 updates.
 

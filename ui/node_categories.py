@@ -8,7 +8,7 @@ class SceneNodeCategory(NodeCategory):
 
 node_categories = [
     SceneNodeCategory('SCENE_NODES', "Scene Nodes", items=[
-        NodeItem("SceneInstanceNodeType"),
+        NodeItem("BlendInputNodeType"),
         NodeItem("AlembicImportNodeType"),
         NodeItem("TransformNodeType"),
         NodeItem("InputNodeType"),
@@ -22,6 +22,8 @@ node_categories = [
         NodeItem("CyclesPropertiesNodeType"),
         NodeItem("EeveePropertiesNodeType"),
         NodeItem("CyclesAttributesNodeType"),
+        NodeItem("EeveeAttributesNodeType"),
+        NodeItem("RenderEngineNodeType"),
         NodeItem("RenderNodeType"),
     ])
 ]
