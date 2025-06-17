@@ -16,7 +16,6 @@ class SCENE_GRAPH_MT_add(Menu):
         layout.operator("node.add_node", text="Group").type = "GroupNodeType"
         layout.operator("node.add_node", text="Light").type = "LightNodeType"
         layout.operator("node.add_node", text="Global Options").type = "GlobalOptionsNodeType"
-        layout.operator("node.add_node", text="Render Outputs").type = "OutputsStubNodeType"
         layout.operator("node.add_node", text="Render Passes").type = "RenderPassesNodeType"
         layout.operator("node.add_node", text="Scene Properties").type = "ScenePropertiesNodeType"
         layout.operator("node.add_node", text="Render Properties").type = "RenderPropertiesNodeType"

@@ -18,7 +18,6 @@ node_categories = [
         NodeItem("GroupNodeType"),
         NodeItem("LightNodeType"),
         NodeItem("GlobalOptionsNodeType"),
-        NodeItem("OutputsStubNodeType"),
         NodeItem("RenderPassesNodeType"),
         NodeItem("CyclesPropertiesNodeType"),
         NodeItem("EeveePropertiesNodeType"),
