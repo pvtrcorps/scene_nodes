@@ -4,6 +4,7 @@ from .node_panel import (
     SCENE_NODES_PT_node_props,
     SCENE_NODES_PT_node_props_properties,
     SCENE_NODES_PT_socket_visibility,
+    SCENE_NODES_PT_operators,
 )
 
 __all__ = [
@@ -12,6 +13,7 @@ __all__ = [
     "SCENE_NODES_PT_node_props",
     "SCENE_NODES_PT_node_props_properties",
     "SCENE_NODES_PT_socket_visibility",
+    "SCENE_NODES_PT_operators",
 ]
 from . import node_panel
 
