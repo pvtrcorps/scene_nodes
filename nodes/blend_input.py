@@ -1,9 +1,9 @@
 import bpy
 from .base import BaseNode, build_props_and_sockets
 
-class SceneInstanceNode(BaseNode):
-    bl_idname = "SceneInstanceNodeType"
-    bl_label = "Scene Instance"
+class BlendInputNode(BaseNode):
+    bl_idname = "BlendInputNodeType"
+    bl_label = "Blend Input"
 
     def init(self, context):
         self.add_enabled_sockets()
@@ -14,7 +14,7 @@ class SceneInstanceNode(BaseNode):
 
 
 build_props_and_sockets(
-    SceneInstanceNode,
+    BlendInputNode,
     [
         (
             "file_path",

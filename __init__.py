@@ -20,10 +20,12 @@ from .nodes.base import (
     BoolSocket,
     VectorSocket,
     StringSocket,
+    EnumSocket,
+    EnumSocket,
 )
 
 # Nodos individuales
-from .nodes.scene_instance import SceneInstanceNode
+from .nodes.blend_input import BlendInputNode
 from .nodes.alembic_import import AlembicImportNode
 from .nodes.transform import TransformNode
 from .nodes.group import GroupNode
@@ -44,6 +46,8 @@ from .nodes.name_switch import (
 from .nodes.cycles_properties import CyclesPropertiesNode
 from .nodes.eevee_properties import EeveePropertiesNode
 from .nodes.cycles_attributes import CyclesAttributesNode
+from .nodes.eevee_attributes import EeveeAttributesNode
+from .nodes.render_engine import RenderEngineNode
 from .nodes.render_passes import (
     RenderPassesNode,
     RenderPassItem,
@@ -69,14 +73,15 @@ classes = [
     BoolSocket,
     VectorSocket,
     StringSocket,
-    SceneInstanceNode, AlembicImportNode, TransformNode, GroupNode,
+    EnumSocket,
+    BlendInputNode, AlembicImportNode, TransformNode, GroupNode,
     LightNode, GlobalOptionsNode, OutputsStubNode, RenderNode, InputNode,
     JoinStringNode, SplitStringNode,
     NameSwitchItem, NameSwitchNode,
     SCENE_NODES_UL_name_switch, SCENE_NODES_OT_name_switch_add,
     SCENE_NODES_OT_name_switch_remove,
     CyclesPropertiesNode, EeveePropertiesNode,
-    CyclesAttributesNode,
+    CyclesAttributesNode, EeveeAttributesNode, RenderEngineNode,
     RenderPassItem, RenderPassesNode,
     SCENE_NODES_UL_render_passes,
     SCENE_NODES_OT_render_pass_add, SCENE_NODES_OT_render_pass_remove,

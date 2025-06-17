@@ -7,7 +7,7 @@ class SCENE_GRAPH_MT_add(Menu):
 
     def draw(self, context):
         layout = self.layout
-        layout.operator("node.add_node", text="Scene Instance").type = "SceneInstanceNodeType"
+        layout.operator("node.add_node", text="Blend Input").type = "BlendInputNodeType"
         layout.operator("node.add_node", text="Transform").type = "TransformNodeType"
         layout.operator("node.add_node", text="Input").type = "InputNodeType"
         layout.operator("node.add_node", text="Join String").type = "JoinStringNodeType"
@@ -20,6 +20,8 @@ class SCENE_GRAPH_MT_add(Menu):
         layout.operator("node.add_node", text="Scene Properties").type = "ScenePropertiesNodeType"
         layout.operator("node.add_node", text="Render Properties").type = "RenderPropertiesNodeType"
         layout.operator("node.add_node", text="Output Properties").type = "OutputPropertiesNodeType"
+        layout.operator("node.add_node", text="Render Engine").type = "RenderEngineNodeType"
+        layout.operator("node.add_node", text="Eevee Attributes").type = "EeveeAttributesNodeType"
         layout.operator("node.add_node", text="Render").type = "RenderNodeType"
 
 def menu_draw(self, context):

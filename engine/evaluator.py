@@ -76,7 +76,7 @@ def _collect_input_scenes(node):
     return scenes
 
 
-def _evaluate_scene_instance(node, _inputs, scene, context):
+def _evaluate_blend_input(node, _inputs, scene, context):
     filepath = (
         _socket_value(node, "File Path", getattr(node, "file_path", ""))
         if getattr(node, "use_file_path", False)
@@ -496,6 +496,24 @@ def _evaluate_cycles_attributes(node, inputs, scene, context):
     return node.scene_nodes_output
 
 
+def _evaluate_eevee_attributes(node, inputs, scene, context):
+    return _evaluate_cycles_attributes(node, inputs, scene, context)
+
+
+def _evaluate_render_engine(node, _inputs, scene, context):
+    scene.render.engine = node.engine
+    if node.engine == 'CYCLES':
+        if getattr(node, "use_feature_set", False):
+            scene.cycles.feature_set = _socket_value(node, "Feature Set", getattr(node, "feature_set", "SUPPORTED"))
+        if getattr(node, "use_device", False):
+            scene.cycles.device = _socket_value(node, "Device", getattr(node, "device", "CPU"))
+        if getattr(node, "use_open_shading_language", False):
+            scene.cycles.use_osl = bool(_socket_value(node, "Open Shading Language", getattr(node, "open_shading_language", False)))
+
+    node.scene_nodes_output = scene.collection
+    return node.scene_nodes_output
+
+
 def _evaluate_join_string(node, _inputs, _scene, context):
     s1 = (
         _socket_value(node, "String 1", getattr(node, "string1", ""))
@@ -585,8 +603,8 @@ def _evaluate_render(node, inputs, scene, context):
 def _evaluate_node(node, scene, context):
     inputs = _collect_input_scenes(node)
     ntype = node.bl_idname
-    if ntype == "SceneInstanceNodeType":
-        return _evaluate_scene_instance(node, inputs, scene, context)
+    if ntype == "BlendInputNodeType":
+        return _evaluate_blend_input(node, inputs, scene, context)
     elif ntype == "AlembicImportNodeType":
         return _evaluate_alembic_import(node, inputs, scene, context)
     elif ntype == "TransformNodeType":
@@ -595,6 +613,10 @@ def _evaluate_node(node, scene, context):
         return _evaluate_group(node, inputs, scene, context)
     elif ntype == "CyclesAttributesNodeType":
         return _evaluate_cycles_attributes(node, inputs, scene, context)
+    elif ntype == "EeveeAttributesNodeType":
+        return _evaluate_eevee_attributes(node, inputs, scene, context)
+    elif ntype == "RenderEngineNodeType":
+        return _evaluate_render_engine(node, inputs, scene, context)
     elif ntype == "LightNodeType":
         return _evaluate_light(node, inputs, scene, context)
     elif ntype == "GlobalOptionsNodeType":

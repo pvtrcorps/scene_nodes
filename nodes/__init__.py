@@ -1,4 +1,4 @@
-from .scene_instance import SceneInstanceNode
+from .blend_input import BlendInputNode
 from .alembic_import import AlembicImportNode
 from .transform import TransformNode
 from .group import GroupNode
@@ -19,6 +19,8 @@ from .name_switch import (
 from .cycles_properties import CyclesPropertiesNode
 from .eevee_properties import EeveePropertiesNode
 from .cycles_attributes import CyclesAttributesNode
+from .eevee_attributes import EeveeAttributesNode
+from .render_engine import RenderEngineNode
 from .render_passes import (
     RenderPassesNode,
     RenderPassItem,
@@ -28,11 +30,12 @@ from .render_passes import (
 )
 
 __all__ = [
-    "SceneInstanceNode", "AlembicImportNode", "TransformNode", "GroupNode",
+    "BlendInputNode", "AlembicImportNode", "TransformNode", "GroupNode",
     "LightNode", "GlobalOptionsNode", "OutputsStubNode",
     "RenderNode", "InputNode",
     "CyclesPropertiesNode", "EeveePropertiesNode",
-    "CyclesAttributesNode", "JoinStringNode", "SplitStringNode",
+    "CyclesAttributesNode", "EeveeAttributesNode", "RenderEngineNode",
+    "JoinStringNode", "SplitStringNode",
     "NameSwitchNode", "NameSwitchItem",
     "SCENE_NODES_UL_name_switch", "SCENE_NODES_OT_name_switch_add",
     "SCENE_NODES_OT_name_switch_remove",
