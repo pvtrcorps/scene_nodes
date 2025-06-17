@@ -429,17 +429,6 @@ def _evaluate_eevee_properties(node, _inputs, scene, context):
     return node.scene_nodes_output
 
 
-def _evaluate_outputs_stub(node, _inputs, scene, context):
-    if getattr(node, "use_filepath", False):
-        path = _socket_value(node, "File Path", getattr(node, "filepath", ""))
-        scene.render.filepath = path
-    if getattr(node, "use_file_format", False):
-        fmt = _socket_value(node, "Format", getattr(node, "file_format", "OPEN_EXR"))
-        scene.render.image_settings.file_format = fmt
-
-    node.scene_nodes_output = scene.collection
-    return node.scene_nodes_output
-
 
 def _evaluate_cycles_attributes(node, inputs, scene, context):
     filter_expr = (
@@ -625,8 +614,6 @@ def _evaluate_node(node, scene, context):
         return _evaluate_cycles_properties(node, inputs, scene, context)
     elif ntype == "EeveePropertiesNodeType":
         return _evaluate_eevee_properties(node, inputs, scene, context)
-    elif ntype == "OutputsStubNodeType":
-        return _evaluate_outputs_stub(node, inputs, scene, context)
     elif ntype == "RenderNodeType":
         return _evaluate_render(node, inputs, scene, context)
     elif ntype == "InputNodeType":
