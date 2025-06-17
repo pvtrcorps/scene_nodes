@@ -31,7 +31,6 @@ from .nodes.transform import TransformNode
 from .nodes.group import GroupNode
 from .nodes.light import LightNode
 from .nodes.global_options import GlobalOptionsNode
-from .nodes.outputs_stub import OutputsStubNode
 from .nodes.render_node import RenderNode
 from .nodes.input import InputNode
 from .nodes.join_string import JoinStringNode
@@ -75,7 +74,7 @@ classes = [
     StringSocket,
     EnumSocket,
     BlendInputNode, AlembicImportNode, TransformNode, GroupNode,
-    LightNode, GlobalOptionsNode, OutputsStubNode, RenderNode, InputNode,
+    LightNode, GlobalOptionsNode, RenderNode, InputNode,
     JoinStringNode, SplitStringNode,
     NameSwitchItem, NameSwitchNode,
     SCENE_NODES_UL_name_switch, SCENE_NODES_OT_name_switch_add,
