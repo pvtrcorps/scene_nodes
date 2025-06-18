@@ -374,6 +374,38 @@ def _evaluate_cycles_properties(node, _inputs, scene, context):
     if getattr(node, "use_max_bounces", False):
         scene.cycles.max_bounces = _socket_value(node, "Max Bounces", getattr(node, "max_bounces", 8))
 
+    if getattr(node, "use_diffuse_bounces", False):
+        scene.cycles.diffuse_bounces = _socket_value(node, "Diffuse Bounces", getattr(node, "diffuse_bounces", 4))
+
+    if getattr(node, "use_adaptive_sampling", False):
+        scene.cycles.use_adaptive_sampling = _socket_value(node, "Adaptive Sampling", getattr(node, "use_adaptive_sampling", False))
+
+    if getattr(node, "use_volume_step_rate", False):
+        scene.cycles.volume_step_rate = _socket_value(node, "Volume Step Rate", getattr(node, "volume_step_rate", 1.0))
+
+    if getattr(node, "use_hair_shape_radius", False):
+        scene.cycles.hair_shape_radius = _socket_value(node, "Hair Shape Radius", getattr(node, "hair_shape_radius", 1.0))
+
+    if getattr(node, "use_simplify", False):
+        scene.render.use_simplify = _socket_value(node, "Use Simplify", getattr(node, "use_simplify", False))
+
+    if getattr(node, "use_motion_blur_shutter", False):
+        scene.render.motion_blur_shutter = _socket_value(node, "Shutter", getattr(node, "motion_blur_shutter", 0.5))
+
+    if getattr(node, "use_film_exposure", False):
+        scene.cycles.film_exposure = _socket_value(node, "Exposure", getattr(node, "film_exposure", 1.0))
+
+    if getattr(node, "use_tile_x", False):
+        scene.cycles.tile_x = _socket_value(node, "Tile X", getattr(node, "tile_x", 64))
+
+    if getattr(node, "use_gpencil_antialias_threshold", False):
+        gp = getattr(scene, "grease_pencil", types.SimpleNamespace(antialias_threshold=1.0))
+        gp.antialias_threshold = _socket_value(node, "Grease Pencil AA", getattr(node, "gpencil_antialias_threshold", 1.0))
+        scene.grease_pencil = gp
+
+    if getattr(node, "use_use_freestyle", False):
+        scene.render.use_freestyle = _socket_value(node, "Use Freestyle", getattr(node, "use_freestyle", False))
+
     if getattr(node, "use_filepath", False):
         scene.render.filepath = _socket_value(node, "File Path", getattr(node, "filepath", ""))
 
@@ -413,8 +445,26 @@ def _evaluate_eevee_properties(node, _inputs, scene, context):
     if getattr(node, "use_samples", False):
         scene.eevee.taa_render_samples = _socket_value(node, "Samples", getattr(node, "samples", 64))
 
+    if getattr(node, "use_use_taa_reprojection", False):
+        scene.eevee.use_taa_reprojection = _socket_value(node, "TAA Reprojection", getattr(node, "use_taa_reprojection", False))
+
+    if getattr(node, "use_clamp_direct", False):
+        scene.eevee.clamp_direct = _socket_value(node, "Clamp Direct", getattr(node, "clamp_direct", 0.0))
+
+    if getattr(node, "use_clamp_indirect", False):
+        scene.eevee.clamp_indirect = _socket_value(node, "Clamp Indirect", getattr(node, "clamp_indirect", 0.0))
+
+    if getattr(node, "use_raytrace_resolution", False):
+        scene.eevee.raytrace_resolution = _socket_value(node, "Raytrace Resolution", getattr(node, "raytrace_resolution", 512))
+
     if getattr(node, "use_motion_blur", False):
         scene.eevee.use_motion_blur = _socket_value(node, "Motion Blur", getattr(node, "motion_blur", False))
+
+    if getattr(node, "use_motion_blur_shutter", False):
+        scene.eevee.motion_blur_shutter = _socket_value(node, "Shutter", getattr(node, "motion_blur_shutter", 0.5))
+
+    if getattr(node, "use_film_exposure", False):
+        scene.eevee.film_exposure = _socket_value(node, "Exposure", getattr(node, "film_exposure", 1.0))
 
     if getattr(node, "use_filepath", False):
         scene.render.filepath = _socket_value(node, "File Path", getattr(node, "filepath", ""))

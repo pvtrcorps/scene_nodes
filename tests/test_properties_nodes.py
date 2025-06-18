@@ -54,11 +54,33 @@ class FakeScene:
             filepath="",
             fps=24,
             image_settings=types.SimpleNamespace(file_format="", color_mode=""),
+            use_simplify=False,
+            motion_blur_shutter=0.0,
+            use_freestyle=False,
         )
         self.frame_start = 1
         self.frame_end = 250
-        self.cycles = types.SimpleNamespace(samples=0, max_bounces=0)
-        self.eevee = types.SimpleNamespace(taa_render_samples=0, use_motion_blur=False)
+        self.cycles = types.SimpleNamespace(
+            samples=0,
+            max_bounces=0,
+            diffuse_bounces=0,
+            use_adaptive_sampling=False,
+            volume_step_rate=1.0,
+            hair_shape_radius=0.0,
+            film_exposure=1.0,
+            tile_x=0,
+        )
+        self.eevee = types.SimpleNamespace(
+            taa_render_samples=0,
+            use_motion_blur=False,
+            use_taa_reprojection=False,
+            clamp_direct=0.0,
+            clamp_indirect=0.0,
+            raytrace_resolution=0,
+            motion_blur_shutter=0.0,
+            film_exposure=1.0,
+        )
+        self.grease_pencil = types.SimpleNamespace(antialias_threshold=1.0)
         self.collection = object()
         self.camera = None
 
@@ -74,6 +96,16 @@ def test_cycles_properties():
         use_camera_path=False,
         use_samples=True, samples=16,
         use_max_bounces=True, max_bounces=4,
+        use_use_adaptive_sampling=True, use_adaptive_sampling=True,
+        use_diffuse_bounces=True, diffuse_bounces=2,
+        use_volume_step_rate=True, volume_step_rate=0.5,
+        use_hair_shape_radius=True, hair_shape_radius=1.5,
+        use_use_simplify=True, use_simplify=True,
+        use_motion_blur_shutter=True, motion_blur_shutter=0.4,
+        use_film_exposure=True, film_exposure=1.2,
+        use_tile_x=True, tile_x=32,
+        use_gpencil_antialias_threshold=True, gpencil_antialias_threshold=0.2,
+        use_use_freestyle=True, use_freestyle=True,
         use_filepath=True, filepath="/tmp/a",
         use_file_format=True, file_format="PNG",
         use_color_mode=True, color_mode="RGBA",
@@ -90,6 +122,16 @@ def test_cycles_properties():
     assert scene.render.fps == 30
     assert scene.cycles.samples == 16
     assert scene.cycles.max_bounces == 4
+    assert scene.cycles.diffuse_bounces == 2
+    assert scene.cycles.use_adaptive_sampling is True
+    assert scene.cycles.volume_step_rate == 0.5
+    assert scene.cycles.hair_shape_radius == 1.5
+    assert scene.render.use_simplify is True
+    assert scene.render.motion_blur_shutter == 0.4
+    assert scene.cycles.film_exposure == 1.2
+    assert scene.cycles.tile_x == 32
+    assert scene.grease_pencil.antialias_threshold == 0.2
+    assert scene.render.use_freestyle is True
     assert scene.render.filepath == "/tmp/a"
     assert scene.render.image_settings.file_format == "PNG"
     assert scene.render.image_settings.color_mode == "RGBA"
@@ -105,7 +147,13 @@ def test_eevee_properties():
         use_fps=True, fps=60,
         use_camera_path=False,
         use_samples=True, samples=8,
+        use_use_taa_reprojection=True, use_taa_reprojection=True,
+        use_clamp_direct=True, clamp_direct=0.1,
+        use_clamp_indirect=True, clamp_indirect=0.2,
+        use_raytrace_resolution=True, raytrace_resolution=256,
         use_motion_blur=True, motion_blur=True,
+        use_motion_blur_shutter=True, motion_blur_shutter=0.3,
+        use_film_exposure=True, film_exposure=1.1,
         use_filepath=True, filepath="/tmp/b",
         use_file_format=True, file_format="OPEN_EXR",
         use_color_mode=True, color_mode="RGB",
@@ -121,7 +169,14 @@ def test_eevee_properties():
     assert scene.frame_end == 15
     assert scene.render.fps == 60
     assert scene.eevee.taa_render_samples == 8
+    assert scene.eevee.use_taa_reprojection is True
+    assert scene.eevee.clamp_direct == 0.1
+    assert scene.eevee.clamp_indirect == 0.2
+    assert scene.eevee.raytrace_resolution == 256
     assert scene.eevee.use_motion_blur is True
+    assert scene.eevee.motion_blur_shutter == 0.3
+    assert scene.eevee.film_exposure == 1.1
     assert scene.render.filepath == "/tmp/b"
     assert scene.render.image_settings.file_format == "OPEN_EXR"
     assert scene.render.image_settings.color_mode == "RGB"
+
