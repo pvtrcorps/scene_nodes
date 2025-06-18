@@ -68,8 +68,7 @@ class RENDER_OT_render_pass_wedge(bpy.types.Operator):
         original_layer = context.window.view_layer
 
         for item in passes_node.passes:
-            setattr(context, "render_pass", item.name)
-            evaluate_scene_tree(tree)
+            evaluate_scene_tree(tree, item.name)
 
             scene = bpy.context.window.scene
             layer = scene.view_layers.get(item.name)
